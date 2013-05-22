@@ -1,5 +1,5 @@
 {
-  "name": "evilPortScanner",
+  "name": "evilportscanner",
   "version": "0.0.1",
   "description": "evilPortScanner is a mandatory addon for evilProbe project. It's a simple TCP port scanner at the moment.",
   "main": "scan.js",
