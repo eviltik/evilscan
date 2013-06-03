@@ -1,5 +1,6 @@
 var net = require('net');
 var socketTimeout = 10000; //miliseconds
+var debug = false;
 
 var IAC={
     ECHO:1,
@@ -29,69 +30,92 @@ var IAC={
     IAC:0xFF
 }
 
-var isOpen = function(host, port, cb) {
-    var isOpen = false;
-    var executed = false;
-    var reason = 'closed';
-    var data='';
+var log = function(msg) {
+    if (debug) console.log(msg);
+}
+
+var isOpen = function(options, cb) {
+
+    var host = options.ip||options.host;
+    var port = options.port;
+    var snaplen = options.snaplen||512;
+    var status = 'close';
+    var banner = '';
+    var raws = [];
 
     var onClose = function() {
-        if (executed) return;
-        executed = true;
-        clearTimeout(timeoutId);
-        delete socket;
+
+        log('closing');
+
+        var raw = null;
+        if (raws.length) {
+            raw = Buffer.concat(raws);
+        }
+
+        if (banner) {
+            // Convert to utf-8,
+            // encode special chars
+            // remove trailing spaces
+            banner = new (require('string_decoder').StringDecoder)('utf-8').write(banner);
+            banner = banner.toString();
+            banner = banner.replace(/\n/gm,'\\n');
+            banner = banner.replace(/\r/gm,'\\r');
+            banner = banner.replace(/\t/gm,'\\t');
+            banner = banner.replace(/ *$/,'');
+            banner = banner.replace(/^ */,'');
+        }
+
         var o = {
-            isOpen:isOpen,
             host:host,
             port:port,
-            reason:reason,
-            data:data
+            status:status,
+            banner:banner,
+            raw:JSON.stringify(raw)
         }
+
+        log(o);
+
+        socket.destroy();
+        delete socket;
         cb(null,o);
     };
 
-    var timeoutId = setTimeout(function() {
-        reason = 'timeout';
-        socket.destroy();
-    }, socketTimeout);
-
-    //console.log('Create connection',host,port);
-
     var socket = net.createConnection(port, host);
+    socket.removeAllListeners('timeout');
     socket.setTimeout(socketTimeout);
 
-    //socket.setEncoding('ascii');
-
     socket.on('close', function() {
-        //console.log('socket closed');
-        if (!executed) {
-            if (!data) isOpen = false;
-            onClose();
-        }
+        if (!banner) isOpen = false;
+        onClose();
     });
 
     socket.on('error', function(e) {
-        //console.log('socket error');
-        if (e.message.match(/EMFILE/)) {
-            cb(e);
+        if (e.message.match(/ECONNREFUSED/)) {
+            return status = 'close (refused)';
         }
-        reason = e.message;
-        if (!executed) onClose();
-        //socket.end();
+        status = e.message;
     });
 
     socket.on('connect', function() {
-        //console.log('socket connected');
+        log('connected');
         isOpen = true;
-        //socket.end();
     });
 
-    var handleIAC = function(buf) {
+    socket.on('timeout',function() {
+        log('socket timeout');
+        if (!banner) {
+            status = 'close (timeout)';
+        } else {
+            status = 'open';
+        }
+        socket.destroy();;
+    });
+
+    var handleIAC = function(buf,socket) {
         var nbIAC = 0;
         var count = 0;
         var str = '';
         for (var i = 0; i<buf.length;i++) {
-            //console.log(buf[i]);
             if (buf[i] == IAC.IAC) {
                 count = 1;
                 nbIAC++;
@@ -127,19 +151,18 @@ var isOpen = function(host, port, cb) {
     }
 
     socket.on('data',function(buf) {
-        buf = handleIAC(buf);
-        data+=buf.toString();
-        if (port = 23) {
-            if (data.match(/login ?:/)) {
-                socket.destroy();
-            }
+        raws.push(buf);
+        buf = handleIAC(buf,socket);
+        if (banner.length < snaplen) {
+            log('onData: '+buf.toString('ascii'));
+            return banner+=buf.toString('ascii');
         }
-        //console.log(data);
+        socket.destroy();
     });
 }
 
 var setSocketTimeout = function(t) {
-    timeout=t;
+    socketTimeout = t;
 }
 
 module.exports = {
