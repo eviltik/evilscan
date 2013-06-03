@@ -45,7 +45,29 @@ Command line options
 **--banner**
 >Grab the banner and export it using utf-8 and encoded special chars (\r\n\t), limited to 512 bytes at the moment. 
 
-TODO: continu documentation
+**--raw**
+>To be documented
+
+**--isopen**
+>To be documented
+
+**--istimeout**
+>To be documented
+
+**--country**
+>To be documented
+
+**--city**
+>To be documented
+
+**--geo**
+>To be documented
+
+**--json**
+>To be documented
+
+**--progress**
+>To be documented
 
 
 Example usage
