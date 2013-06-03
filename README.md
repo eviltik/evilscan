@@ -14,9 +14,7 @@ Work in progress (no version released at the moment):
 * DONE: raw option, output json string having raw Buffer of the grabbed banner
 * DONE: banner option, grab the banner if possible
 * DONE: support IAC challenge for telnet/ftp connection
-
 * IN PROGRESS: output formater (json, xml, console)
-
 * TODO: implement connection success for non verbose ports (http, rpc, dns, ..)
 * TODO: banner length options
 
