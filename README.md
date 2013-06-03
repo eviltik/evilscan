@@ -22,7 +22,7 @@ Install
 Command line options
 -------
 **--target=[ip|host|cidr range]**
->* Specify the target you want to scan, examples :
+>Specify the target you want to scan, examples :
 >```
 >--target=127.0.0.1/24 
 >--target=test.com
