@@ -13,7 +13,7 @@ Work in progress :
 * IN PROGRESS: output formater (json, xml, console)
 
 Example usage
-==============
+----------------
 
 Every ports on localhost, grab banner, display only opened or timeouted ports
 ```
