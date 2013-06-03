@@ -1,3 +1,5 @@
+var net = require('net');
+
 var long2ip = function(ip) {
     if (!isFinite(ip)) return false;
     return [ip >>> 24, ip >>> 16 & 0xFF, ip >>> 8 & 0xFF, ip & 0xFF].join('.');
@@ -29,6 +31,9 @@ var ip2long = function(ip) {
 var get = function(range,cb) {
     var ip_addr_cidr = range;
     var ip_arr = ip_addr_cidr.split('/');
+    if (!ip_arr[1]) return;
+    if (!ip_arr[1].match(/^[0-9]{1,2}$/)) return;
+    if (!net.isIPv4(ip_arr[0])) return;
 
     var bin='';
     for (var i=1;i<=32;i++) {
