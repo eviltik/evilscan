@@ -1,4 +1,9 @@
 evilPortScanner
 ===============
 
-Simple and stupid ports scanner
+Massive TCP port scanner.
+
+Work in progress.
+
+
+
