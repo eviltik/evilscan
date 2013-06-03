@@ -15,9 +15,8 @@ Work in progress :
 Example usage
 ==============
 
-```
 Every ports on localhost, grab banner, display only opened or timeouted ports
-
+```
 root@debian:~# ./scan.js --target=127.0.0.1 --ports=0-65535 --banner --isopen --istimeout
 127.0.0.1:111|close (timeout)
 127.0.0.1:81|close (timeout)
@@ -31,9 +30,8 @@ root@debian:~# ./scan.js --target=127.0.0.1 --ports=0-65535 --banner --isopen --
 127.0.0.1:59725|close (timeout)
 ```
 
-```
 Every ports on localhost, grab banner, display only opened or timeouted ports, json output, progress status each seconds
-
+```
 root@debian:~# ./scan.js --target=127.0.0.1 --ports=0-65535 --banner --isopen --istimeout --progress --json
 {"_timeStart":"N/A","_timeElapsed":"N/A","_jobsTotal":65535,"_jobsRunning":0,"_jobsDone":0,"_progress":0,"_concurrency":800,"_status":"Starting","_message":"Starting"}
 {"_timeStart":1370249987522,"_timeElapsed":1071,"_jobsTotal":65535,"_jobsRunning":800,"_jobsDone":9864,"_progress":15,"_concurrency":800,"_status":"Running","_message":"Scanned 127.0.0.1:9123"}
