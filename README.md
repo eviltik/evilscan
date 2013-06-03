@@ -3,14 +3,34 @@ evilPortScanner
 
 Massive TCP port scanner.
 
-Work in progress :
+Work in progress (no version released at the moment):
 * DONE: implement connection refused
 * DONE: implement connection timeout
 * DONE: implement connection success for verbose ports (telnet, ftp, ssh, ..)
-* TODO: implement connection success for non verbose ports (http, rpc, dns, ..) 
 * DONE: optional progress indicator
-* DONE: optional geoip (country,city,longitude,latitude)
+* DONE: optional geoip infos (country,city,longitude,latitude)
+* DONE: SIGUSR1 = pause, SIGUSR2 = unpause
 * IN PROGRESS: output formater (json, xml, console)
+* TODO: implement connection success for non verbose ports (http, rpc, dns, ..)
+
+Install
+-------
+
+* not available as a npm module, please be patient, it will be asap
+
+
+Command line options
+-------
+* --target=[ip|host|cidr range]
+    Specify the target you want to scan
+    Examples: 
+        --target=127.0.0.1/24 
+        --target=test.com
+
+* --ports=[single port|port-range|mixed]
+    
+* --banner
+
 
 Example usage
 ----------------
