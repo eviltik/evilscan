@@ -24,14 +24,20 @@
     "url": "https://github.com/evitik/evilPortScanner/issues"
   },
   "dependencies": {
-    "async": "~0.2.7",
-    "execSync": "~0.0.3",
-    "geoip": "~0.4.9",
-    "optimist": "~0.3.7",
-    "printf": "~0.1.1",
-    "qjobs": "~0.9.8",
-    "step": "~0.0.5",
-    "winston": "~0.6.2"
+    "async": "latest",
+    "execSync": "latest",
+    "geoip": "latest",
+    "optimist": "latest",
+    "printf": "latest",
+    "qjobs": "latest",
+    "winston": "latest"
   },
-  "devDependencies": {}
+  "scripts":{
+      "test":"make test"
+  },
+  "devDependencies": {
+    "chai":"latest",
+    "mocha":"latest",
+    "sol-telnet":"latest"
+  }
 }
