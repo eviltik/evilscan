@@ -4,14 +4,21 @@ evilPortScanner
 Massive TCP port scanner.
 
 Work in progress (no version released at the moment):
+
 * DONE: implement connection refused
 * DONE: implement connection timeout
 * DONE: implement connection success for verbose ports (telnet, ftp, ssh, ..)
 * DONE: optional progress indicator
 * DONE: optional geoip infos (country,city,longitude,latitude)
 * DONE: SIGUSR1 = pause, SIGUSR2 = unpause
+* DONE: raw option, output json string having raw Buffer of the grabbed banner
+* DONE: banner option, grab the banner if possible
+* DONE: support IAC challenge for telnet/ftp connection
+
 * IN PROGRESS: output formater (json, xml, console)
+
 * TODO: implement connection success for non verbose ports (http, rpc, dns, ..)
+* TODO: banner length options
 
 Install
 -------
@@ -28,9 +35,19 @@ Command line options
 >--target=test.com
 >```
 
-* --ports=[single port|port-range|mixed]
-    
-* --banner
+**--ports=[single port|port-range|mixed]**
+>Specify port(s) you want to scan, examples :
+>```
+>--ports=80
+>--ports=21,23
+>--ports=21,23,5900-5910
+>--ports=0-65535
+>```
+
+**--banner**
+>Grab the banner and export it using utf-8 and encoded special chars (\r\n\t), limited to 512 bytes at the moment. 
+
+TODO: continu documentation
 
 
 Example usage
