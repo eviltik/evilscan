@@ -1,7 +1,9 @@
-evilPortScanner
+evilscan
 ===============
 
-Massive TCP port scanner. [![Build Status](https://secure.travis-ci.org/eviltik/evilPortScanner.png)](http://travis-ci.org/franck34/qjobs)
+Massive TCP port scanner (tcp connect). 
+
+[![Build Status](https://secure.travis-ci.org/eviltik/evilscan.png)](http://travis-ci.org/eviltik/evilscan)
 
 Work in progress (no version released at the moment):
 
@@ -17,6 +19,7 @@ Work in progress (no version released at the moment):
 * IN PROGRESS: output formater (json, xml, console)
 * TODO: implement connection success for non verbose ports (http, rpc, dns, ..)
 * TODO: banner length options
+
 
 Install
 -------
