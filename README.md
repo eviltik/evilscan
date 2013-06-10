@@ -33,14 +33,15 @@ Command line options
 >--target=test.com
 >```
 
-**--ports=[single port|port-range|mixed]**
->Specify port(s) you want to scan, examples :
+**--port=[single port|port-range|mixed]**
+>Specific port(s) you want to scan, examples :
 >```
->--ports=80
->--ports=21,23
->--ports=21,23,5900-5910
->--ports=0-65535
+>--port=80
+>--port=21,23
+>--port=21,23,5900-5910
+>--port=0-65535
 >```
+If not specified, no tcp scan. Usefull to fetch massive geoip infos without scanning ports
 
 **--banner**
 >Grab the banner and export it using utf-8 and encoded special chars (\r\n\t), limited to 512 bytes at the moment. 
@@ -48,26 +49,26 @@ Command line options
 **--raw**
 >To be documented
 
-**--isopen**
->To be documented
+**--isclose [=true|false, default false]**
+>Shortcut for --isrefused and --istimeout
 
-**--istimeout**
->To be documented
+**--isrefuse [=true|false, default false]**
+>Show only ports having connection refused
 
-**--country**
->To be documented
+**--istimeout [=true|false, default false]**
+>Show only ports having connection timeout
 
-**--city**
->To be documented
+**--isopen[=true|false, default true]**
+>Remove opened port from the result if value is false
 
 **--geo**
->To be documented
+>Add geoip information (city,country,latitude,longitude)
 
 **--json**
->To be documented
+>Show result as a json string
 
 **--progress**
->To be documented
+>Show progress status every seconds
 
 
 Example usage
@@ -75,7 +76,7 @@ Example usage
 
 * Every ports on localhost, grab banner, display only opened or timeouted ports
 ```
-root@debian:~# ./scan.js --target=127.0.0.1 --ports=0-65535 --banner --isopen --istimeout
+root@debian:~# ./scan.js --target=127.0.0.1 --port=0-65535 --banner --isopen --istimeout
 127.0.0.1:111|close (timeout)
 127.0.0.1:81|close (timeout)
 127.0.0.1:53|close (timeout)
@@ -90,23 +91,29 @@ root@debian:~# ./scan.js --target=127.0.0.1 --ports=0-65535 --banner --isopen --
 
 * Every ports on localhost, grab banner, display only opened or timeouted ports, json output, progress status each seconds
 ```
-root@debian:~# ./scan.js --target=127.0.0.1 --ports=0-65535 --banner --isopen --istimeout --progress --json
-{"_timeStart":"N/A","_timeElapsed":"N/A","_jobsTotal":65535,"_jobsRunning":0,"_jobsDone":0,"_progress":0,"_concurrency":800,"_status":"Starting","_message":"Starting"}
-{"_timeStart":1370249987522,"_timeElapsed":1071,"_jobsTotal":65535,"_jobsRunning":800,"_jobsDone":9864,"_progress":15,"_concurrency":800,"_status":"Running","_message":"Scanned 127.0.0.1:9123"}
+root@debian:~# ./scan.js --target=127.0.0.1 --port=0-65535 --banner --isopen --istimeout --progress --json
+"_timeStart":"N/A","_timeElapsed":"N/A","_jobsTotal":65535,"_jobsRunning":0,"_jobsDone":0,"_progress":0,"_concurrency":800,"_status":"Starting","_message":"Starting"}
+{"_timeStart":1370867204668,"_timeElapsed":1061,"_jobsTotal":65535,"_jobsRunning":800,"_jobsDone":6950,"_progress":10,"_concurrency":800,"_status":"Running","_message":"Scanned 127.0.0.1:6211"}
 {"ip":"127.0.0.1","port":111,"status":"close (timeout)"}
 {"ip":"127.0.0.1","port":81,"status":"close (timeout)"}
 {"ip":"127.0.0.1","port":53,"status":"close (timeout)"}
 {"ip":"127.0.0.1","port":23,"status":"open","banner":"Debian GNU/Linux jessie/sid\\r\\ndebian login:"}
 {"ip":"127.0.0.1","port":5432,"status":"close (timeout)"}
-{"_timeStart":1370249987522,"_timeElapsed":2092,"_jobsTotal":65535,"_jobsRunning":800,"_jobsDone":19851,"_progress":30,"_concurrency":800,"_status":"Running","_message":"Scanned 127.0.0.1:19101"}
-{"_timeStart":1370249987522,"_timeElapsed":3125,"_jobsTotal":65535,"_jobsRunning":800,"_jobsDone":30535,"_progress":46,"_concurrency":800,"_status":"Running","_message":"Scanned 127.0.0.1:29804"}
+{"_timeStart":1370867204668,"_timeElapsed":2104,"_jobsTotal":65535,"_jobsRunning":800,"_jobsDone":14761,"_progress":22,"_concurrency":800,"_status":"Running","_message":"Scanned 127.0.0.1:13965"}
+{"_timeStart":1370867204668,"_timeElapsed":3220,"_jobsTotal":65535,"_jobsRunning":800,"_jobsDone":23187,"_progress":35,"_concurrency":800,"_status":"Running","_message":"Scanned 127.0.0.1:22395"}
+{"_timeStart":1370867204668,"_timeElapsed":4223,"_jobsTotal":65535,"_jobsRunning":800,"_jobsDone":30874,"_progress":47,"_concurrency":800,"_status":"Running","_message":"Scanned 127.0.0.1:30110"}
 {"ip":"127.0.0.1","port":27017,"status":"close (timeout)"}
 {"ip":"127.0.0.1","port":28017,"status":"close (timeout)"}
-{"_timeStart":1370249987522,"_timeElapsed":4130,"_jobsTotal":65535,"_jobsRunning":800,"_jobsDone":40467,"_progress":61,"_concurrency":800,"_status":"Running","_message":"Scanned 127.0.0.1:39713"}
-{"ip":"127.0.0.1","port":34170,"status":"close (timeout)"}
-{"_timeStart":1370249987522,"_timeElapsed":5180,"_jobsTotal":65535,"_jobsRunning":800,"_jobsDone":51215,"_progress":78,"_concurrency":800,"_status":"Running","_message":"Scanned 127.0.0.1:50421"}
-{"_timeStart":1370249987522,"_timeElapsed":6256,"_jobsTotal":65535,"_jobsRunning":800,"_jobsDone":61103,"_progress":93,"_concurrency":800,"_status":"Running","_message":"Scanned 127.0.0.1:60322"}
-{"ip":"127.0.0.1","port":52988,"status":"close (timeout)"}
-{"ip":"127.0.0.1","port":59725,"status":"close (timeout)"}
-{"_timeStart":1370249987522,"_timeElapsed":7089,"_jobsTotal":65535,"_jobsRunning":0,"_jobsDone":65535,"_progress":100,"_concurrency":800,"_status":"Finished","_message":"Scanned 127.0.0.1:59725"}
-```
+{"_timeStart":1370867204668,"_timeElapsed":5223,"_jobsTotal":65535,"_jobsRunning":800,"_jobsDone":38657,"_progress":58,"_concurrency":800,"_status":"Running","_message":"Scanned 127.0.0.1:37878"}
+{"ip":"127.0.0.1","port":33953,"status":"close (timeout)"}
+{"ip":"127.0.0.1","port":36712,"status":"close (timeout)"}
+{"_timeStart":1370867204668,"_timeElapsed":6271,"_jobsTotal":65535,"_jobsRunning":800,"_jobsDone":46369,"_progress":70,"_concurrency":800,"_status":"Running","_message":"Scanned 127.0.0.1:45578"}
+{"ip":"127.0.0.1","port":40802,"status":"close (timeout)"}
+{"_timeStart":1370867204668,"_timeElapsed":7365,"_jobsTotal":65535,"_jobsRunning":800,"_jobsDone":54829,"_progress":83,"_concurrency":800,"_status":"Running","_message":"Scanned 127.0.0.1:54108"}
+{"ip":"127.0.0.1","port":53013,"status":"close (timeout)"}
+{"ip":"127.0.0.1","port":53656,"status":"close (timeout)"}
+{"ip":"127.0.0.1","port":53632,"status":"close (timeout)"}
+{"ip":"127.0.0.1","port":53400,"status":"close (timeout)"}
+{"_timeStart":1370867204668,"_timeElapsed":8394,"_jobsTotal":65535,"_jobsRunning":800,"_jobsDone":62449,"_progress":95,"_concurrency":800,"_status":"Running","_message":"Scanned 127.0.0.1:61697"}
+{"_timeStart":1370867204668,"_timeElapsed":8744,"_jobsTotal":65535,"_jobsRunning":0,"_jobsDone":65535,"_progress":100,"_concurrency":800,"_status":"Finished","_message":"Scanned 127.0.0.1:64739"}
+

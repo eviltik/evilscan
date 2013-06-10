@@ -11,30 +11,18 @@ var parse = require('./libs/optionsParser');
 var City = require('geoip').City;
 var geoip = new City(__dirname+'/geoip/GeoLiteCity.dat');
 
-var ips = parse.getTargets(argv.target||'127.0.0.1');
-var ports = parse.getPorts(argv.port||'1-65535');
-
-if (ips.error) {
-    output(ips);
-    process.exit(0);
-}
-
-if (ports.error) {
-    output(ports);
-    process.exit(0);
-}
-
-portscan.setSocketTimeout(argv.timeout||1000);
-
+var ips,ports;
 var li = 0;
 var progress = 0;
 var previousProgress = -1;
 var currentIp, currentPort;
 var banner = 150;
 var lastMessage = 'Starting';
+portscan.setSocketTimeout(argv.timeout||1000);
+var q = require('qjobs')({maxConcurrency:argv.concurrency||800});
 
 var geoCheck = function(args,next) {
-    if (!argv.city &&! argv.country && !argv.loc) {
+    if (!argv.geo) {
         return next();
     }
     geoip.lookup(args.ip,next);
@@ -67,6 +55,7 @@ var scan = function(args,nextIteration) {
         },
 
         function(next) {
+            if (o.port == 0) return next();
             portscan.isOpen(args,next);
         }
 
@@ -74,17 +63,18 @@ var scan = function(args,nextIteration) {
 
         // geolocalisation
         var geo = arr[0];
-        if (argv.city || argv.loc) {
-            o.city = geo.city || '';
-        }
 
-        if (argv.country || argv.loc) {
-            o.country = geo.country_name || '';
-        }
-
-        if (argv.loc) {
-            o.latitude = geo.latitude || '';
-            o.longitude = geo.longitude || '';
+        if (argv.geo) {
+            o.city = '';
+            o.country = '';
+            o.latitude = '';
+            o.longitude = '';
+            if (geo) {
+                o.city = geo.city || '';
+                o.country = geo.country_name || '';
+                o.latitude = geo.latitude || '';
+                o.longitude = geo.longitude || '';
+            }
         }
 
         // reverse
@@ -92,22 +82,34 @@ var scan = function(args,nextIteration) {
             o.reverse = arr[1][0]||'';
         }
 
+        if (o.port == 0 && ports.length == 1) {
+
+            argv.showall = true;
+            delete o.port;
+            output(o);
+            return nextIteration();
+        }
+
         // scan
         var res = arr[2];
-
         if (res && res.status!='open') {
 
             if (res.status.match(/EMFILE/)) {
                 output({"message":"Error: too many opened sockets, please ulimit -n 65535"});
                 process.exit();
             }
+            if (!argv.isclose) {
+                if (res.status.match(/refused/) && !argv.isrefuse) {
+                    o = null;
+                }
+                if (res.status.match(/timeout/) && !argv.istimeout) {
+                    o = null;
+                }
+            }
+        }
 
-            if (res.status.match(/refused/) && argv.isopen) {
-                o = null;
-            }
-            if (res.status.match(/timeout/) && !argv.istimeout) {
-                o = null;
-            }
+        if (res.status == 'open' && argv.isopen == 'false') {
+            o = null;
         }
 
         if (o) {
@@ -117,15 +119,6 @@ var scan = function(args,nextIteration) {
             }
             if (argv.raw) {
                 o.raw = res.raw;
-            }
-
-            if (argv.showcount) {
-                if (argv.ignore) {
-                    o.__i = args.i;
-                } else {
-                    o.__i = li;
-                }
-                o.__max = args.max;
             }
 
             if (argv.output != 'json' &&! argv.json) {
@@ -140,75 +133,91 @@ var scan = function(args,nextIteration) {
 }
 
 
-var q = require('qjobs')({maxConcurrency:argv.concurrency||800});
-
-if (argv.cidr == '127.0.0.1/24') {
-    // For testing purpose, a telnet server can not
-    // accept more than 50 simultaneous connection,
-    // so let's make a pause between each pools
-    q.setInterval(1000);
-}
-
-// Push scan jobs in the queue
-var max = ips.length;
-var i = 0;
-while (ips.length) {
-    var ip = ips.shift();
-    ports.forEach(function(port) {
-        if (port) q.add(scan,{ip:ip,port:port,i:i++,max:max});
-    });
-}
-
-/*
-q.on('jobStart',function(r) {
-    console.log(r);
-});
-*/
-
-/* progress indicator */
-
-var displayProgress = function() {
-    var o = q.stats();
-    if (!paused) {
-        o._message = lastMessage;
-    } else {
-        o._message = 'Paused';
-        o._status='Paused';
+var start = function() {
+    if (argv.cidr == '127.0.0.1/24') {
+        // For testing purpose, a telnet server can not
+        // accept more than 50 simultaneous connection,
+        // so let's make a pause between each pools
+        q.setInterval(1000);
     }
 
-    progress = o.__progress;
-    console.log(JSON.stringify(o));
-}
+    // Push scan jobs in the queue
+    var max = ips.length;
+    var i = 0;
+    while (ips.length) {
+        var ip = ips.shift();
+        ports.forEach(function(port) {
+            q.add(scan,{ip:ip,port:port,i:i++,max:max});
+        });
+    }
 
-if (argv.progress) {
-    displayProgress();
-    var progressTimer = setInterval(displayProgress,1000);
-    q.on('end',function() {
-        clearInterval(progressTimer);
+    /*
+    q.on('jobStart',function(r) {
+        console.log(r);
+    });
+    */
+
+    /* progress indicator */
+
+    var displayProgress = function() {
+        var o = q.stats();
+        if (!paused) {
+            o._message = lastMessage;
+        } else {
+            o._message = 'Paused';
+            o._status='Paused';
+        }
+
+        progress = o.__progress;
+        console.log(JSON.stringify(o));
+    }
+
+    if (argv.progress) {
         displayProgress();
+        var progressTimer = setInterval(displayProgress,1000);
+        q.on('end',function() {
+            clearInterval(progressTimer);
+            displayProgress();
+        });
+        q.on('jobEnd',function(args) {
+            lastMessage = 'Scanned '+args.ip+':'+args.port;
+        });
+    }
+
+    /* pause stuff */
+
+    var paused = false;
+    process.on('SIGUSR1',function() {
+        //console.log('{"message":"Received SIGUSR1"}');
+        if (!paused) {
+            paused = true;
+            lastMessage = 'Pause';
+        } else {
+            paused = false
+        }
+        q.pause(paused);
     });
-    q.on('jobEnd',function(args) {
-        lastMessage = 'Scanned '+args.ip+':'+args.port;
-    });
+
+    q.run();
 }
 
-/* pause stuff */
-
-var paused = false;
-process.on('SIGUSR1',function() {
-    //console.log('{"message":"Received SIGUSR1"}');
-    if (!paused) {
-        paused = true;
-        lastMessage = 'Pause';
-    } else {
-        paused = false
+async.series([
+    function(next) {
+        parse.getTargets(argv.target,next);
+    },
+    function(next) {
+        parse.getPorts(argv.port||null,next);
     }
-    q.pause(paused);
-});
+],function(err,result) {
 
-//try {
-q.run();
-//} catch (e) {
-//    console.log(e)
-//}
+    if (err) {
+        console.log(err);
+        process.exit(0);
+    }
+
+    ips = result[0];
+    ports = result[1];
+    start();
+
+});
 
