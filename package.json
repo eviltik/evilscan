@@ -1,27 +1,28 @@
 {
-  "name": "evilportscanner",
+  "name": "evilscan",
   "version": "0.0.1",
-  "description": "evilPortScanner is a mandatory addon for evilProbe project. It's a simple TCP port scanner at the moment.",
-  "main": "scan.js",
+  "description": "Simple TCP port scanner, evilscan is a mandatory addon for evilprobe project.",
+  "main": "evilscan.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/evitik/evilPortScanner"
+    "url": "git://github.com/evitik/evilscan"
   },
   "keywords": [
     "security",
     "port scanner",
     "scanner",
-    "evilProbe"
+    "network",
+    "evilprobe"
   ],
   "author": "eviltik",
   "license": "Beerware",
   "readmeFilename": "README.md",
   "gitHead": "04dc1848981c48dfe5e36af1afaab2d29cdcde12",
   "bugs": {
-    "url": "https://github.com/evitik/evilPortScanner/issues"
+    "url": "https://github.com/evitik/evilscan/issues"
   },
   "dependencies": {
     "async": "latest",

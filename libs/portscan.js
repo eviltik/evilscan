@@ -93,6 +93,9 @@ var isOpen = function(options, cb) {
         if (e.message.match(/ECONNREFUSED/)) {
             return status = 'close (refused)';
         }
+        if (e.message.match(/EHOSTUNREACH/)) {
+            return status = 'close (unreachable)';
+        }
         status = e.message;
     });
 

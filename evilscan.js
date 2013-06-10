@@ -18,21 +18,16 @@ var previousProgress = -1;
 var currentIp, currentPort;
 var banner = 150;
 var lastMessage = 'Starting';
+var progressTimer;
 portscan.setSocketTimeout(argv.timeout||1000);
 var q = require('qjobs')({maxConcurrency:argv.concurrency||800});
 
 var geoCheck = function(args,next) {
-    if (!argv.geo) {
-        return next();
-    }
-    geoip.lookup(args.ip,next);
+
 }
 
 var reverseLookup = function(args,next) {
-    if (!argv.reverse) {
-        return next();
-    }
-    dns.reverse(args.ip,next);
+
 }
 
 
@@ -47,11 +42,17 @@ var scan = function(args,nextIteration) {
 
     async.series([
         function(next) {
-            geoCheck(args,next);
+                if (!argv.geo) {
+                    return next();
+                }
+                geoip.lookup(args.ip,next);;
         },
 
         function(next) {
-            reverseLookup(args,next);
+                if (!argv.reverse) {
+                    return next();
+                }
+                dns.reverse(args.ip,next);
         },
 
         function(next) {
@@ -98,12 +99,16 @@ var scan = function(args,nextIteration) {
                 output({"message":"Error: too many opened sockets, please ulimit -n 65535"});
                 process.exit();
             }
+
             if (!argv.isclose) {
                 if (res.status.match(/refused/) && !argv.isrefuse) {
                     o = null;
                 }
                 if (res.status.match(/timeout/) && !argv.istimeout) {
                     o = null;
+                }
+                if (res.status.match(/unreachable/) && !argv.isunreachable) {
+                    o =null;
                 }
             }
         }
@@ -151,12 +156,6 @@ var start = function() {
         });
     }
 
-    /*
-    q.on('jobStart',function(r) {
-        console.log(r);
-    });
-    */
-
     /* progress indicator */
 
     var displayProgress = function() {
@@ -174,7 +173,7 @@ var start = function() {
 
     if (argv.progress) {
         displayProgress();
-        var progressTimer = setInterval(displayProgress,1000);
+        progressTimer = setInterval(displayProgress,1000);
         q.on('end',function() {
             clearInterval(progressTimer);
             displayProgress();
