@@ -17,7 +17,7 @@ suite('Scan geoip info only #', function(a) {
 
     test('youtube test',function(next) {
 
-        var args = './scan --target 173.194.45.67 --geo --json';
+        var args = './evilscan --target 173.194.45.67 --geo --json';
 
         var proc = spawn('node',args.split(' '));
         var linereader = rl.createInterface(proc.stdout, proc.stdin);
@@ -38,11 +38,15 @@ suite('Scan geoip info only #', function(a) {
             next();
         });
 
+        proc.stderr.on('data',function(data) {
+            throw new Error(data.toString());
+        });
+
     });
 
     test('microsoft test',function(next) {
 
-        var args = './scan --target 65.55.57.27 --geo --json';
+        var args = './evilscan --target 65.55.57.27 --geo --json';
 
         var proc = spawn('node',args.split(' '));
         var linereader = rl.createInterface(proc.stdout,proc.stdin);
@@ -62,5 +66,10 @@ suite('Scan geoip info only #', function(a) {
         proc.on('close',function() {
             next();
         });
+
+        proc.stderr.on('data',function(data) {
+            throw new Error(data.toString());
+        });
+
     });
 });
