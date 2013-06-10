@@ -1,30 +1,19 @@
 evilscan
 ===============
 
-Massive TCP port scanner (tcp connect). 
+Massive TCP port scanner (tcp connect). Work in progress. 
 
 [![Build Status](https://secure.travis-ci.org/eviltik/evilscan.png)](http://travis-ci.org/eviltik/evilscan)
 
-Work in progress (no version released at the moment):
-
-* DONE: implement connection refused
-* DONE: implement connection timeout
-* DONE: implement connection success for verbose ports (telnet, ftp, ssh, ..)
-* DONE: optional progress indicator
-* DONE: optional geoip infos (country,city,longitude,latitude)
-* DONE: SIGUSR1 = pause, SIGUSR2 = unpause
-* DONE: raw option, output json string having raw Buffer of the grabbed banner
-* DONE: banner option, grab the banner if possible
-* DONE: support IAC challenge for telnet/ftp connection
-* IN PROGRESS: output formater (json, xml, console)
-* TODO: implement connection success for non verbose ports (http, rpc, dns, ..)
-* TODO: banner length options
 
 
 Install
 -------
 
-* not available as a npm module, please be patient, it will be asap
+>Travis said it's ok using nodejs >= 0.9. So you can install evilscan globaly using npm, as usual :
+>```
+>npm install -g evilscan
+>```
 
 
 Command line options
