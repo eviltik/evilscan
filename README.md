@@ -1,7 +1,7 @@
 evilPortScanner
 ===============
 
-Massive TCP port scanner.
+Massive TCP port scanner. [![Build Status](https://secure.travis-ci.org/eviltik/evilPortScanner.png)](http://travis-ci.org/franck34/qjobs)
 
 Work in progress (no version released at the moment):
 
