@@ -53,8 +53,6 @@ var scan = function(args,nextIteration) {
 
     ],function(err,arr) {
 
-        //null,"mail.yescafe.co.kr",{"host":"122.99.130.66","port":21,"status":"close (timeout)","banner":"","raw":"null"}
-
         // geolocalisation
         var geo = arr[0];
 
@@ -133,6 +131,7 @@ var scan = function(args,nextIteration) {
         if (argv.reverse) {
             if (o) {
                 if (o.port == 0) {
+                    delete o.port;
                     if (o.reverse == '') {
                         return nextIteration();
                     }
