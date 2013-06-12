@@ -121,6 +121,8 @@ var scan = function(args,nextIteration) {
                 o.ip = o.ip+':'+o.port;
                 delete o.port;
             }
+
+            if (!argv.json) process.stdout.write('\r\033[0K');
             output(o);
         }
 
@@ -148,7 +150,6 @@ var start = function() {
     }
 
     /* progress indicator */
-
     var displayProgress = function() {
         var o = q.stats();
         if (!paused) {
@@ -158,8 +159,12 @@ var start = function() {
             o._status='Paused';
         }
 
-        progress = o.__progress;
-        console.log(JSON.stringify(o));
+        progress = o._progress;
+        if (argv.json) {
+            console.log(JSON.stringify(o));
+        } else {
+            process.stdout.write(printf("\r%s (%s%)",lastMessage,o._progress));
+        }
     }
 
     if (argv.progress) {
@@ -169,6 +174,7 @@ var start = function() {
             clearInterval(progressTimer);
             displayProgress();
         });
+
         q.on('jobEnd',function(args) {
             lastMessage = 'Scanned '+args.ip+':'+args.port;
         });
