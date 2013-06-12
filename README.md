@@ -1,15 +1,25 @@
 evilscan
 ===============
 
-Massive TCP port scanner (tcp connect). Work in progress. 
-
 [![Build Status](https://secure.travis-ci.org/eviltik/evilscan.png)](http://travis-ci.org/eviltik/evilscan)
+
+Massive TCP port scanner (tcp connect). Work in progress.
+
+Currently support :
+
+* individual IP or IP range scan
+* individual port, ports list, or ports range 
+* banner grabbing (not fully implemented, works will with verbose ports)
+* IAC negotiation 
+* geolocation information
+* shell or json output
+* progress details
+
 
 
 Status
 -------
 Very early stage, the code need a big refactoring. But well, it's working as expected at the moment.
-
 
 Install
 -------
