@@ -141,7 +141,7 @@ root@debian:~# evilscan --target=127.0.0.1 --port=0-65535 --banner --isopen --is
 ```
 
 Tips :
-=======
+--------
 **Conncurrency and fast scan**
 
 By default, concurrency is 100. Which is slow when you are scanning large ip range or large port range. You can pass a bigger value using --concurrency option. 1000 is fast by example.
@@ -159,8 +159,7 @@ kill -SIGUSR1 19859 # where 19859 is the pid of nodejs process running evilscan
 ```
 
 Help needed
-=======
-
+----------
 Do not hesitate to open issues and ask for features. Right now i just need "connect" scan. Forks are welcome. UDP implementation or syn scans should be great. Code refactoring too, and more tests.
 
 If you are using evilscan, **please star it** !
@@ -168,7 +167,7 @@ If you are using evilscan, **please star it** !
 
 
 Thank you
-=======
+----------
 Special thanks to authors of theses nodejs modules :
 * [node-portscanner](https://github.com/baalexander/node-portscanner) for the inspiration
 * [qjobs](https://github.com/franck34/qjobs "qjobs") pause/unpause queue jobs is really cool
