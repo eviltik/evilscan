@@ -6,6 +6,10 @@ Massive TCP port scanner (tcp connect). Work in progress.
 [![Build Status](https://secure.travis-ci.org/eviltik/evilscan.png)](http://travis-ci.org/eviltik/evilscan)
 
 
+Status
+-------
+Very early stage, the code need a big refactoring. But well, it's working as expected at the moment.
+
 
 Install
 -------
