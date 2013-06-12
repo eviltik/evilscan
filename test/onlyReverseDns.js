@@ -4,7 +4,7 @@ var net = require('net')
 var spawn = require('child_process').spawn;
 var rl = require('readline');
 
-suite('Scan geoip info only #', function(a) {
+suite('Reverse dns only #', function(a) {
 
     var checkString = function(data) {
         expect(data).to.be.a('string');
@@ -15,9 +15,9 @@ suite('Scan geoip info only #', function(a) {
         expect(r).to.have.property('ip');
     }
 
-    test('youtube test',function(next) {
+    test('64.4.11.37 should return 00001001.ch',function(next) {
 
-        var args = './evilscan --target 173.194.45.67 --geo --json';
+        var args = './evilscan --target 64.4.11.37 --reverse --json';
 
         var proc = spawn('node',args.split(' '));
         var linereader = rl.createInterface(proc.stdout, proc.stdin);
@@ -27,11 +27,7 @@ suite('Scan geoip info only #', function(a) {
             checkString(data);
             var obj = JSON.parse(data);
             checkJson(obj);
-            expect(obj.ip).to.be.equal('173.194.45.67');
-            expect(obj.city).to.be.equal('Mountain View');
-            expect(obj.country).to.be.equal('United States');
-            expect(obj.latitude).to.be.equal(37.4192008972168);
-            expect(obj.longitude).to.be.equal(-122.05740356445312);
+            expect(obj.reverse).to.be.equal('00001001.ch');
         });
 
         proc.on('close',function() {
@@ -44,32 +40,33 @@ suite('Scan geoip info only #', function(a) {
 
     });
 
-    test('microsoft test',function(next) {
-
-        var args = './evilscan --target 65.55.57.27 --geo --json';
+    test('massive reverse on 173.194.40.0/24 should return 253 no empty results',function(next) {
+        this.timeout(5000);
+        var done = 0;
+        var args = './evilscan --target 173.194.40.162/24  --json --reverse --concurrency=5';
 
         var proc = spawn('node',args.split(' '));
-        var linereader = rl.createInterface(proc.stdout,proc.stdin);
+        var linereader = rl.createInterface(proc.stdout, proc.stdin);
 
         linereader.on('line',function(data) {
             data = data.toString();
             checkString(data);
             var obj = JSON.parse(data);
             checkJson(obj);
-            expect(obj.ip).to.be.equal('65.55.57.27');
-            expect(obj.city).to.be.equal('Redmond');
-            expect(obj.country).to.be.equal('United States');
-            expect(obj.latitude).to.be.equal(47.68009948730469);
-            expect(obj.longitude).to.be.equal(-122.12059783935547);
+            expect(obj.reverse).to.be.a('string');
+            expect(obj.reverse.length>0).to.be.equal(true);
+            expect(obj.port).to.be.equal(undefined);
+            done++;
         });
 
         proc.on('close',function() {
+            expect(done).to.be.equal(253);
             next();
         });
 
         proc.stderr.on('data',function(data) {
             throw new Error(data.toString());
         });
-
     });
+
 });
