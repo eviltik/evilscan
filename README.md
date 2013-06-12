@@ -11,6 +11,7 @@ Currently support :
 * individual port, ports list, or ports range 
 * banner grabbing (not fully implemented, works will with verbose ports)
 * IAC negotiation 
+* reverse dns
 * geolocation information
 * shell or json output
 * progress details
@@ -48,6 +49,9 @@ Command line options
 >--port=0-65535
 >```
 If not specified, no tcp scan. Usefull to fetch massive geoip infos without scanning ports
+
+**--reverse**
+>Resolve DNS
 
 **--banner**
 >Grab the banner and export it using utf-8 and encoded special chars (\r\n\t), limited to 512 bytes at the moment. 
