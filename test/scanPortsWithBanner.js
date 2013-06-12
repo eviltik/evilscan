@@ -77,7 +77,7 @@ suite('Scan ports showing a banner #', function(a) {
         expect(r).to.have.property('status');
     }
 
-    test('connection refused',function(next) {
+    test('connection refused 127.0.0.1:'+port,function(next) {
         this.timeout(testTimeout);
         portscan.isOpen({host:'127.0.0.1',port:port},function(err,r) {
             commonCheck(r);
@@ -86,7 +86,8 @@ suite('Scan ports showing a banner #', function(a) {
         });
     });
 
-    test('connection timeout',function(next) {
+    /*
+    test('connection timeout 127.0.0.1:'+port,function(next) {
         this.timeout(testTimeout);
         var srv = server({timeout:10000,banner:'empty'},function(err) {
             portscan.isOpen({host:'127.0.0.1',port:port},function(err,r) {
@@ -96,8 +97,9 @@ suite('Scan ports showing a banner #', function(a) {
             });
         });
     });
+    */
 
-    test('connection success',function(next) {
+    test('connection success 127.0.0.1:'+port,function(next) {
         this.timeout(testTimeout);
         var banner = 'hello\r\nworld\r\n';
         var srv = server({banner:banner},function(err) {
