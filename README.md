@@ -108,4 +108,24 @@ root@debian:~# ./scan.js --target=127.0.0.1 --port=0-65535 --banner --isopen --i
 {"ip":"127.0.0.1","port":53400,"status":"close (timeout)"}
 {"_timeStart":1370867204668,"_timeElapsed":8394,"_jobsTotal":65535,"_jobsRunning":800,"_jobsDone":62449,"_progress":95,"_concurrency":800,"_status":"Running","_message":"Scanned 127.0.0.1:61697"}
 {"_timeStart":1370867204668,"_timeElapsed":8744,"_jobsTotal":65535,"_jobsRunning":0,"_jobsDone":65535,"_progress":100,"_concurrency":800,"_status":"Finished","_message":"Scanned 127.0.0.1:64739"}
+```
+
+
+Help needed
+=======
+
+Do not hesitate to open issues and ask for features. Right now i just need "connect" scan. Forks are welcome. UDP implementation or syn scans should be great. Code refactoring too, and more tests.
+
+If you are using evilscan, **please star it** !
+
+
+
+Thank you
+=======
+Special thanks to authors of theses nodejs modules :
+* [node-portscanner](https://github.com/baalexander/node-portscanner) for the inspiration
+* [qjobs](https://github.com/franck34/qjobs "qjobs") pause/unpause queue jobs is really cool
+
+and [dailyjs](http://dailyjs.com/) ;)
+
 
