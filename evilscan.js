@@ -33,17 +33,17 @@ var scan = function(args,nextIteration) {
 
     async.series([
         function(next) {
-                if (!argv.geo) {
-                    return next();
-                }
-                geoip.lookup(args.ip,next);;
+            if (!argv.geo) return next();
+            geoip.lookup(args.ip,next);
         },
 
         function(next) {
-                if (!argv.reverse) {
-                    return next();
-                }
-                dns.reverse(args.ip,next);
+            if (!argv.reverse) return next();
+            dns.reverse(args.ip,function(err,domains) {
+                if (err) return next(null);
+                if (!domains.length) return next(null);
+                next(null,domains[0]);
+            });
         },
 
         function(next) {
@@ -52,6 +52,8 @@ var scan = function(args,nextIteration) {
         }
 
     ],function(err,arr) {
+
+        //null,"mail.yescafe.co.kr",{"host":"122.99.130.66","port":21,"status":"close (timeout)","banner":"","raw":"null"}
 
         // geolocalisation
         var geo = arr[0];
@@ -71,44 +73,25 @@ var scan = function(args,nextIteration) {
 
         // reverse
         if (argv.reverse) {
-            o.reverse = arr[1][0]||'';
+            o.reverse = '';
+            if (arr[1]) {
+                o.reverse = arr[1];
+                //console.log(o.ip,o.reverse,JSON.stringify(arr[2]));
+            }
         }
 
-        if (o.port == 0 && ports.length == 1) {
-
+        if (o && o.port == 0 && ports.length == 1 && !argv.reverse) {
             argv.showall = true;
             delete o.port;
+            if (!argv.json) process.stdout.write('\r\033[0K');
             output(o);
             return nextIteration();
         }
 
         // scan
         var res = arr[2];
-        if (res && res.status!='open') {
+        if (res && o) {
 
-            if (res.status.match(/EMFILE/)) {
-                output({"message":"Error: too many opened sockets, please ulimit -n 65535"});
-                process.exit();
-            }
-
-            if (!argv.isclose) {
-                if (res.status.match(/refused/) && !argv.isrefuse) {
-                    o = null;
-                }
-                if (res.status.match(/timeout/) && !argv.istimeout) {
-                    o = null;
-                }
-                if (res.status.match(/unreachable/) && !argv.isunreachable) {
-                    o =null;
-                }
-            }
-        }
-
-        if (res.status == 'open' && argv.isopen == 'false') {
-            o = null;
-        }
-
-        if (o) {
             o.status = res.status;
             if (argv.banner && res.banner) {
                 o.banner = res.banner;
@@ -122,6 +105,46 @@ var scan = function(args,nextIteration) {
                 delete o.port;
             }
 
+            if (res.status!='open') {
+
+                if (res.status.match(/EMFILE/)) {
+                    output({"message":"Error: too many opened sockets, please ulimit -n 65535"});
+                    process.exit();
+                }
+
+                if (!argv.isclose) {
+                    if (res.status.match(/refused/) && !argv.isrefuse) {
+                        o = null;
+                    }
+                    if (res.status.match(/timeout/) && !argv.istimeout) {
+                        o = null;
+                    }
+                    if (res.status.match(/unreachable/) && !argv.isunreachable) {
+                        o = null;
+                    }
+                }
+            }
+
+            if (res.status == 'open' && argv.isopen == 'false') {
+                o = null;
+            }
+        }
+
+        if (argv.reverse) {
+            if (o) {
+                if (o.port == 0) {
+                    if (o.reverse == '') {
+                        return nextIteration();
+                    }
+                } else {
+                    if (o.status == undefined) {
+                        return nextIteration();
+                    }
+                }
+            }
+        }
+
+        if (o) {
             if (!argv.json) process.stdout.write('\r\033[0K');
             output(o);
         }
@@ -177,7 +200,9 @@ var start = function() {
         });
 
         q.on('jobEnd',function(args) {
-            lastMessage = 'Scanned '+args.ip+':'+args.port;
+            var str = args.ip;
+            if (args.port!=0) str+=':'+args.port;
+            lastMessage = 'Scanned '+str;
         });
     }
 
