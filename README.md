@@ -72,22 +72,25 @@ Example usage
 
 * Every ports on localhost, grab banner, display only opened or timeouted ports
 ```
-root@debian:~# ./scan.js --target=127.0.0.1 --port=0-65535 --banner --isopen --istimeout
-127.0.0.1:111|close (timeout)
-127.0.0.1:81|close (timeout)
-127.0.0.1:53|close (timeout)
+root@debian:~# evilscan --target=127.0.0.1 --port=0-65535 --banner --isopen --istimeout
+127.0.0.1:81|open
+127.0.0.1:53|open
+127.0.0.1:111|open
 127.0.0.1:23|open|Debian GNU/Linux jessie/sid\r\ndebian login:
-127.0.0.1:5432|close (timeout)
-127.0.0.1:27017|close (timeout)
-127.0.0.1:28017|close (timeout)
-127.0.0.1:34170|close (timeout)
-127.0.0.1:52988|close (timeout)
-127.0.0.1:59725|close (timeout)
+127.0.0.1:5432|open
+127.0.0.1:27017|open
+127.0.0.1:28017|open
+127.0.0.1:33746|open
+127.0.0.1:35854|open
+127.0.0.1:40076|open
+127.0.0.1:40802|open
+127.0.0.1:55553|open
+127.0.0.1:57523|open
 ```
 
 * Every ports on localhost, grab banner, display only opened or timeouted ports, json output, progress status each seconds
 ```
-root@debian:~# ./scan.js --target=127.0.0.1 --port=0-65535 --banner --isopen --istimeout --progress --json
+root@debian:~# evilscan --target=127.0.0.1 --port=0-65535 --banner --isopen --istimeout --progress --json
 "_timeStart":"N/A","_timeElapsed":"N/A","_jobsTotal":65535,"_jobsRunning":0,"_jobsDone":0,"_progress":0,"_concurrency":800,"_status":"Starting","_message":"Starting"}
 {"_timeStart":1370867204668,"_timeElapsed":1061,"_jobsTotal":65535,"_jobsRunning":800,"_jobsDone":6950,"_progress":10,"_concurrency":800,"_status":"Running","_message":"Scanned 127.0.0.1:6211"}
 {"ip":"127.0.0.1","port":111,"status":"close (timeout)"}
