@@ -7,7 +7,7 @@ var async = require('async');
 var getTargets = function(target,cb) {
 
     if (!target) {
-        return cb("Please specify a target using --target [cidr|ipv4|host]");
+        return cb("Please specify at least a target using --target [cidr|ipv4|host], example:\nevilscan --target=192.168.0.0/24 --port=21,22,23,80,5900-5910");
     }
 
     var ips = [];

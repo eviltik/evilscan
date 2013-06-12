@@ -30,6 +30,45 @@ var IAC={
     IAC:0xFF
 }
 
+var handleIAC = function(buf,socket) {
+    var nbIAC = 0;
+    var count = 0;
+    var str = '';
+    for (var i = 0; i<buf.length;i++) {
+        if (buf[i] == IAC.IAC) {
+            count = 1;
+            nbIAC++;
+            str='IAC ';
+        } else if (count==1) {
+            switch (buf[i]) {
+                case IAC.DO:    str+='DO ';     break;
+                case IAC.DONT:  str+='DONT ';   break;
+                case IAC.WILL:  str+='WILL ';   break;
+                case IAC.WONT:  str+='WONT ';   break;
+            }
+            count++;
+        } else if (count==2) {
+            switch (buf[i]) {
+                case IAC.ECHO:                  str+='ECHO';                break;
+                case IAC.SUPPRESS_GO_AHEAD:     str+='SUPPRESS_GO_AHEAD';   break;
+                case IAC.STATUS:                str+='STATUS';              break;
+                case IAC.TIMING_MARK:           str+='TIMING_MARK';         break;
+                case IAC.TERMINAL_TYPE:         str+='TERMINAL_TYPE';       break;
+                case IAC.WINDOW_SIZE:           str+='WINDOW_SIZE';         break;
+                case IAC.TERMINAL_SPEED:        str+='TERMINAL_SPEED';      break;
+                case IAC.REMOTE_FLOW_CONTROL:   str+='REMOTE_FLOW_CONTROL'; break;
+                case IAC.LINEMODE:              str+='LINEMODE';            break;
+                case IAC.ENV_VARS:              str+='ENV_VARS';            break;
+                default:                        str+='UNKNOW';              break;
+            }
+            var nbuf = new Buffer([IAC.IAC,IAC.WONT,buf[i]]);
+            socket.write(nbuf);
+            buf.slice(count*nbIAC);
+        }
+    }
+    return buf.slice(nbIAC*3);
+}
+
 var log = function(msg) {
     if (debug) console.log(msg);
 }
@@ -42,10 +81,12 @@ var isOpen = function(options, cb) {
     var status = 'close';
     var banner = '';
     var raws = [];
+    var http = options.http;
+    var opened = false;
 
     var onClose = function() {
 
-        log('closing');
+        log(host+':'+port+' closing');
 
         var raw = null;
         if (raws.length) {
@@ -73,19 +114,19 @@ var isOpen = function(options, cb) {
             raw:JSON.stringify(raw)
         }
 
-        log(o);
+        log(host+':'+port+' '+JSON.stringify(o));
 
         socket.destroy();
         delete socket;
         cb(null,o);
     };
 
-    var socket = net.createConnection(port, host);
+    var socket = new net.createConnection(port, host);
     socket.removeAllListeners('timeout');
     socket.setTimeout(socketTimeout);
 
     socket.on('close', function() {
-        if (!banner) isOpen = false;
+        if (!banner) opened = false;
         onClose();
     });
 
@@ -100,13 +141,13 @@ var isOpen = function(options, cb) {
     });
 
     socket.on('connect', function() {
-        log('connected');
-        isOpen = true;
+        log(host+':'+port+' connected');
+        opened = true;
     });
 
     socket.on('timeout',function() {
-        log('socket timeout');
-        if (!banner) {
+        log(host+':'+port+' socket timeout (opened '+opened+')');
+        if (!opened) {
             status = 'close (timeout)';
         } else {
             status = 'open';
@@ -114,51 +155,15 @@ var isOpen = function(options, cb) {
         socket.destroy();;
     });
 
-    var handleIAC = function(buf,socket) {
-        var nbIAC = 0;
-        var count = 0;
-        var str = '';
-        for (var i = 0; i<buf.length;i++) {
-            if (buf[i] == IAC.IAC) {
-                count = 1;
-                nbIAC++;
-                str='IAC ';
-            } else if (count==1) {
-                switch (buf[i]) {
-                    case IAC.DO:    str+='DO ';     break;
-                    case IAC.DONT:  str+='DONT ';   break;
-                    case IAC.WILL:  str+='WILL ';   break;
-                    case IAC.WONT:  str+='WONT ';   break;
-                }
-                count++;
-            } else if (count==2) {
-                switch (buf[i]) {
-                    case IAC.ECHO:                  str+='ECHO';                break;
-                    case IAC.SUPPRESS_GO_AHEAD:     str+='SUPPRESS_GO_AHEAD';   break;
-                    case IAC.STATUS:                str+='STATUS';              break;
-                    case IAC.TIMING_MARK:           str+='TIMING_MARK';         break;
-                    case IAC.TERMINAL_TYPE:         str+='TERMINAL_TYPE';       break;
-                    case IAC.WINDOW_SIZE:           str+='WINDOW_SIZE';         break;
-                    case IAC.TERMINAL_SPEED:        str+='TERMINAL_SPEED';      break;
-                    case IAC.REMOTE_FLOW_CONTROL:   str+='REMOTE_FLOW_CONTROL'; break;
-                    case IAC.LINEMODE:              str+='LINEMODE';            break;
-                    case IAC.ENV_VARS:              str+='ENV_VARS';            break;
-                    default:                        str+='UNKNOW';              break;
-                }
-                var nbuf = new Buffer([IAC.IAC,IAC.WONT,buf[i]]);
-                socket.write(nbuf);
-                buf.slice(count*nbIAC);
-            }
-        }
-        return buf.slice(nbIAC*3);
-    }
-
     socket.on('data',function(buf) {
         raws.push(buf);
         buf = handleIAC(buf,socket);
         if (banner.length < snaplen) {
-            log('onData: '+buf.toString('ascii'));
-            return banner+=buf.toString('ascii');
+            var d = buf.toString('ascii');
+            if (d) {
+                log(host+':'+port+' data: '+buf.toString('ascii').replace(/[\n\r]/,' '));
+            }
+            return banner += buf.toString('ascii');
         }
         socket.destroy();
     });

@@ -20,16 +20,7 @@ var banner = 150;
 var lastMessage = 'Starting';
 var progressTimer;
 portscan.setSocketTimeout(argv.timeout||1000);
-var q = require('qjobs')({maxConcurrency:argv.concurrency||800});
-
-var geoCheck = function(args,next) {
-
-}
-
-var reverseLookup = function(args,next) {
-
-}
-
+var q = require('qjobs')({maxConcurrency:argv.concurrency||100});
 
 var scan = function(args,nextIteration) {
 
