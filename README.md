@@ -127,8 +127,9 @@ root@debian:~# evilscan --target=127.0.0.1 --port=0-65535 --banner --isopen --is
 {"_timeStart":1370867204668,"_timeElapsed":8744,"_jobsTotal":65535,"_jobsRunning":0,"_jobsDone":65535,"_progress":100,"_concurrency":800,"_status":"Finished","_message":"Scanned 127.0.0.1:64739"}
 ```
 
-Concurrency tips :
+Tips :
 =======
+**Conncurrency and fast scan**
 By default, concurrency is 100. Which is slow when you are scanning large ip range or large port range. You can pass a bigger value using --concurrency option. 1000 is fast by example.
 On some linux, only 1024 concurrency opened sockets are allowed. To break this limit, t you have to update ulimit parameter of your linux first :
 
@@ -136,6 +137,11 @@ On some linux, only 1024 concurrency opened sockets are allowed. To break this l
 ulimit -u unlimited
 ```
 
+**Pause/unpause**
+You can pause/unpause a running scan by sending SIGUSR1 signal
+```
+kill -SIGUSR1 19859 # where 19859 is the pid of nodejs process running evilscan
+```
 
 Help needed
 =======
