@@ -173,6 +173,7 @@ var start = function() {
         q.on('end',function() {
             clearInterval(progressTimer);
             displayProgress();
+            if (!argv.json) console.log();
         });
 
         q.on('jobEnd',function(args) {
