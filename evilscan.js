@@ -6,7 +6,7 @@ var dns = require('dns');
 var argv = require('optimist').argv;
 var async = require('async');
 var output = require('./libs/output');
-var parse = require('./libs/optionsParser');
+var options = require('./libs/optionsParser');
 
 var City = require('geoip').City;
 var geoip = new City(__dirname+'/geoip/GeoLiteCity.dat');
@@ -78,7 +78,7 @@ var scan = function(args,nextIteration) {
             }
         }
 
-        if (o && o.port == 0 && ports.length == 1 && !argv.reverse) {
+        if (o && o.port == 0 && !argv.reverse) {
             argv.showall = true;
             delete o.port;
             if (!argv.json) process.stdout.write('\r\033[0K');
@@ -153,8 +153,8 @@ var scan = function(args,nextIteration) {
 }
 
 
-var start = function() {
-    if (argv.cidr == '127.0.0.1/24') {
+var start = function(ips,ports) {
+    if (ips.length == 1 && ips[0].match(/^127.0.0.1\//)) {
         // For testing purpose, a telnet server can not
         // accept more than 50 simultaneous connection,
         // so let's make a pause between each pools
@@ -222,23 +222,10 @@ var start = function() {
     q.run();
 }
 
-async.series([
-    function(next) {
-        parse.getTargets(argv.target,next);
-    },
-    function(next) {
-        parse.getPorts(argv.port||null,next);
-    }
-],function(err,result) {
-
+options.parse(argv.target,argv.port,function(err,ips,port) {
     if (err) {
-        console.log(err);
+        console.log('Error',err);
         process.exit(0);
     }
-
-    ips = result[0];
-    ports = result[1];
-    start();
-
+    start(ips,port);
 });
-

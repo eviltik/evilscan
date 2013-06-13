@@ -102,7 +102,24 @@ var getPorts = function(port,cb) {
     return cb('Port: unknow error');
 }
 
+
+function parse(target,port,cb) {
+    async.series([
+        function(next) {
+            getTargets(target,next);
+        },
+        function(next) {
+            getPorts(port||null,next);
+        }
+    ],function(err,result) {
+
+        if (err) return cb(err);
+        cb(null,result[0],result[1]);
+    });
+}
+
 module.exports = {
     getTargets:getTargets,
-    getPorts:getPorts
+    getPorts:getPorts,
+    parse:parse
 }
