@@ -29,7 +29,6 @@
   },
   "dependencies": {
     "async": "latest",
-    "execSync": "latest",
     "geoip": "latest",
     "optimist": "latest",
     "printf": "latest",
