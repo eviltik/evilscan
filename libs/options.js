@@ -2,8 +2,6 @@ var net = require('net');
 var cidr = require('./cidr');
 var dns = require('dns');
 var async = require('async');
-var program = require('commander');
-
 
 var getTargets = function(target,cb) {
 
