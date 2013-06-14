@@ -6,13 +6,16 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+
   "bin": {
     "evilscan": "./bin/evilscan.js"
   },
+
   "repository": {
     "type": "git",
     "url": "git://github.com/eviltik/evilscan"
   },
+
   "keywords": [
     "security",
     "port scanner",
@@ -20,6 +23,7 @@
     "network",
     "evilprobe"
   ],
+
   "author": "eviltik",
   "license": "GPLv3",
   "readmeFilename": "README.md",
@@ -27,6 +31,7 @@
   "bugs": {
     "url": "https://github.com/eviltik/evilscan/issues"
   },
+
   "dependencies": {
     "async": "latest",
     "geoip": "latest",
@@ -34,10 +39,12 @@
     "printf": "latest",
     "qjobs": "latest",
     "winston": "latest"
-  },
+  }
+  ,
   "scripts":{
       "test":"make test"
   },
+
   "devDependencies": {
     "chai":"latest",
     "mocha":"latest",
