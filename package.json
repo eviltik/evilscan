@@ -30,7 +30,7 @@
   "dependencies": {
     "async": "latest",
     "geoip": "latest",
-    "optimist": "latest",
+    "optimist": "0.5.0",
     "printf": "latest",
     "qjobs": "latest",
     "winston": "latest"
