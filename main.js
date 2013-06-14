@@ -25,6 +25,8 @@ var evilscan = function(opts,cb) {
         nbIpToScan:0,
         nbPortToScan:0
     };
+    this.cacheGeo = {};
+    this.cacheDns = {};
 
     this.options = opts;
 
@@ -148,6 +150,8 @@ evilscan.prototype.initQueue = function() {
     }
 
     this.q.on('end',function() {
+        self.cacheGeo = {};
+        self.cacheDns = {};
         self.emit('done');
         if (self.cbrun) self.cbrun();
     });
@@ -187,13 +191,26 @@ evilscan.prototype.init = function() {
 }
 
 evilscan.prototype.lookupGeo = function(ip,cb) {
-    if (!this.options.geo) return cb();
+
+    if (!this.options.geo) {
+        return cb();
+    }
+
+    if (this.cacheGeo[ip]) {
+        return cb(null,this.cacheGeo[ip]);
+    }
+
     geoip.lookup(ip,cb);
 }
 
 evilscan.prototype.lookupDns = function(ip,cb) {
     var self = this;
     if (!this.options.reverse) return cb();
+
+    if (this.cacheDns[ip]) {
+        return cb(null,this.cacheDns[ip]);
+    }
+
     dns.reverse(ip,function(err,domains) {
         if (err) {
             if (err.code == 'ENOTFOUND') {
@@ -235,6 +252,8 @@ evilscan.prototype.resultAddGeo = function(result,r) {
 
     if (!result) return r;
 
+    this.cacheGeo[r.ip] = result;
+
     r.city = result.city || '';
     r.country = result.country_name || '';
     r.latitude = result.latitude || '';
@@ -248,6 +267,9 @@ evilscan.prototype.resultAddDns = function(result,r) {
     r.reverse = '';
     if (!result) return r;
     r.reverse = result;
+
+    this.cacheDns[r.ip] = result;
+
     return r;
 }
 
