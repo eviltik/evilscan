@@ -68,7 +68,7 @@ var server = function(options,cb) {
 suite(path.basename(__filename), function(a) {
 
     var socketTimeout = 100;
-    var testTimeout = 200;
+    var testTimeout = 300;
 
     var tcpconnect = require('../libs/tcpconnect');
     tcpconnect.setSocketTimeout(socketTimeout);
