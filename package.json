@@ -1,6 +1,6 @@
 {
   "name": "evilscan",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Massive TCP ports scanner, evilscan is a mandatory addon for evilprobe project.",
   "main": "main.js",
   "scripts": {
