@@ -1,5 +1,8 @@
 var net = require('net');
 var socketTimeout = 10000; //miliseconds
+var defaultSocketTimeout = 10000; //miliseconds
+var defaultSnapLen = 512;
+
 var debug = false;
 
 var IAC={
@@ -73,11 +76,12 @@ var log = function(msg) {
     if (debug) console.log(msg);
 }
 
-var isOpen = function(options, cb) {
+var checkPort = function(options, cb) {
 
     var host = options.ip||options.host;
     var port = options.port;
-    var snaplen = options.snaplen||512;
+    var snaplen = options.snaplen|| defaultSnapLen;
+    var timeout = options.timeout || defaultSocketTimeout;
     var status = 'close';
     var banner = '';
     var raws = [];
@@ -123,7 +127,7 @@ var isOpen = function(options, cb) {
 
     var socket = new net.createConnection(port, host);
     socket.removeAllListeners('timeout');
-    socket.setTimeout(socketTimeout);
+    socket.setTimeout(timeout);
 
     socket.on('close', function() {
         if (!banner) opened = false;
@@ -174,6 +178,6 @@ var setSocketTimeout = function(t) {
 }
 
 module.exports = {
-    isOpen:isOpen,
+    checkPort:checkPort,
     setSocketTimeout:setSocketTimeout
 }

@@ -1,4 +1,4 @@
-REPORTER = spec
+#REPORTER = spec
 REPORTER = tap
 
 test:

@@ -1,15 +1,14 @@
 #!/usr/bin/env node
-var cidr = require('./libs/cidr');
-var portscan = require('./libs/portscan');
+var cidr = require('./cidr');
+var portscan = require('./portscan');
 var printf = require('printf');
 var dns = require('dns');
-var argv = require('optimist').argv;
 var async = require('async');
-var output = require('./libs/output');
-var options = require('./libs/optionsParser');
+var output = require('./output');
+var options = require('./options');
 
 var City = require('geoip').City;
-var geoip = new City(__dirname+'/geoip/GeoLiteCity.dat');
+var geoip = new City(__dirname+'/../geoip/GeoLiteCity.dat');
 
 var ips,ports;
 var li = 0;
@@ -19,8 +18,6 @@ var currentIp, currentPort;
 var banner = 150;
 var lastMessage = 'Starting';
 var progressTimer;
-portscan.setSocketTimeout(argv.timeout||1000);
-var q = require('qjobs')({maxConcurrency:argv.concurrency||100});
 
 var scan = function(args,nextIteration) {
 
@@ -153,8 +150,12 @@ var scan = function(args,nextIteration) {
 }
 
 
-var start = function(ips,ports) {
-    if (ips.length == 1 && ips[0].match(/^127.0.0.1\//)) {
+var start = function(argv) {
+
+    var q = require('qjobs')({maxConcurrency:argv.concurrency||500});
+    portscan.setSocketTimeout(argv.timeout||1000);
+
+    if (argv.ips.length == 1 && argv.ips[0].match(/^127.0.0.1\//)) {
         // For testing purpose, a telnet server can not
         // accept more than 50 simultaneous connection,
         // so let's make a pause between each pools
@@ -162,11 +163,11 @@ var start = function(ips,ports) {
     }
 
     // Push scan jobs in the queue
-    var max = ips.length;
+    var max = argv.ips.length;
     var i = 0;
-    while (ips.length) {
-        var ip = ips.shift();
-        ports.forEach(function(port) {
+    while (argv.ips.length) {
+        var ip = argv.ips.shift();
+        argv.ports.forEach(function(port) {
             q.add(scan,{ip:ip,port:port,i:i++,max:max});
         });
     }
@@ -178,7 +179,7 @@ var start = function(ips,ports) {
             o._message = lastMessage;
         } else {
             o._message = 'Paused';
-            o._status='Paused';
+            o._status = 'Paused';
         }
 
         progress = o._progress;
@@ -222,10 +223,16 @@ var start = function(ips,ports) {
     q.run();
 }
 
-options.parse(argv.target,argv.port,function(err,ips,port) {
-    if (err) {
-        console.log('Error',err);
-        process.exit(0);
-    }
-    start(ips,port);
-});
+var run = function(opts) {
+    options.parse(opts,function(err,options) {
+        if (err) {
+            console.log('Error: ',err);
+            process.exit(0);
+        }
+        start(options);
+    });
+}
+
+module.exports = {
+    run:run
+}

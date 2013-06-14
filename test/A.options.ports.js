@@ -1,11 +1,12 @@
 
 var expect = require('chai').expect;
+var path = require('path');
 
-suite('Command line options (port) #', function() {
+suite(path.basename(__filename), function() {
 
-    var getPorts = require('../libs/optionsParser.js').getPorts;
+    var getPorts = require('../libs/options.js').getPorts;
 
-    test('no port specified',function() {
+    test('port: no port specified',function() {
         getPorts(null,function(err,r) {
             expect(err).to.be.equal(null);
             expect(r).to.be.a('array');
@@ -13,14 +14,14 @@ suite('Command line options (port) #', function() {
         });
     });
 
-    test('bad port (--port=xy)',function() {
+    test('port: bad port (--port=xy)',function() {
         getPorts('xy',function(err,r) {
             expect(err).to.match(/invalid port/i);
             expect(r).to.be.equal(undefined);
         });
     });
 
-    test('single string port (--port=21)',function() {
+    test('port: valid single port (--port=21)',function() {
         getPorts('21',function(err,r) {
             expect(err).to.be.equal(null);
             expect(r).to.be.a('array');
@@ -28,15 +29,7 @@ suite('Command line options (port) #', function() {
         });
     });
 
-    test('single int port (--port=21)',function() {
-        getPorts(21,function(err,r) {
-            expect(err).to.be.equal(null);
-            expect(r).to.be.a('array');
-            expect(r[0]).to.be.equal(21);
-        });
-    });
-
-    test('port range (--port=21-23)',function() {
+    test('port: valid port range (--port=21-23)',function() {
         getPorts('21-23',function(err,r) {
             expect(err).to.be.equal(null);
             expect(r).to.be.a('array');
@@ -45,7 +38,7 @@ suite('Command line options (port) #', function() {
         });
     });
 
-    test('port list (--port=21,22,23)',function() {
+    test('port: valid port list (--port=21,22,23)',function() {
         getPorts('21,22,23',function(err,r) {
             expect(err).to.be.equal(null);
             expect(r).to.be.a('array');
@@ -54,7 +47,7 @@ suite('Command line options (port) #', function() {
         });
     });
 
-    test('port mixed (--port=21-23,80)',function() {
+    test('port: valid port mixed (--port=21-23,80)',function() {
         getPorts('21-23,80',function(err,r) {
             expect(err).to.be.equal(null);
             expect(r).to.be.a('array');

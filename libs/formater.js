@@ -14,8 +14,8 @@ var outputRaw = function(o) {
     console.log(str);
 }
 
-var output = function(o) {
-    if (argv.output == 'json' || argv.json) {
+var output = function(o,argv) {
+    if (argv.json) {
         return outputJson(o);
     }
     return outputRaw(o);

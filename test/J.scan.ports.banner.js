@@ -2,6 +2,7 @@
 var expect = require('chai').expect;
 var net = require('net')
 var telnet = require('sol-telnet'); // the only one supporting IAC server side
+var path = require('path');
 
 var port = 1026;
 
@@ -64,13 +65,13 @@ var server = function(options,cb) {
     return s;
 }
 
-suite('Scan ports showing a banner #', function(a) {
+suite(path.basename(__filename), function(a) {
 
     var socketTimeout = 100;
     var testTimeout = 200;
 
-    var portscan = require('../libs/portscan');
-    portscan.setSocketTimeout(socketTimeout);
+    var tcpconnect = require('../libs/tcpconnect');
+    tcpconnect.setSocketTimeout(socketTimeout);
 
     var commonCheck = function(r) {
         expect(r).to.be.a('object');
@@ -79,7 +80,7 @@ suite('Scan ports showing a banner #', function(a) {
 
     test('connection refused 127.0.0.1:'+port,function(next) {
         this.timeout(testTimeout);
-        portscan.isOpen({host:'127.0.0.1',port:port},function(err,r) {
+        tcpconnect.checkPort({host:'127.0.0.1',port:port},function(err,r) {
             commonCheck(r);
             expect(r.status).to.be.equal('close (refused)');
             next();
@@ -103,7 +104,7 @@ suite('Scan ports showing a banner #', function(a) {
         this.timeout(testTimeout);
         var banner = 'hello\r\nworld\r\n';
         var srv = server({banner:banner},function(err) {
-            portscan.isOpen({host:'127.0.0.1',port:port},function(err,r) {
+            tcpconnect.checkPort({ip:'127.0.0.1',port:port,timeout:testTimeout-10},function(err,r) {
                 commonCheck(r);
                 expect(r.status).to.be.equal('open');
                 expect(r.banner).to.be.equal('hello\\r\\nworld\\r\\n');

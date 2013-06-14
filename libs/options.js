@@ -8,7 +8,7 @@ var program = require('commander');
 var getTargets = function(target,cb) {
 
     if (!target) {
-        return cb("Please specify at least a target using --target [cidr|ipv4|host], example:\nevilscan --target=192.168.0.0/24 --port=21,22,23,80,5900-5910");
+        return cb("Please specify at least a target using --target [cidr|ipv4|host], example:\nevilscan 192.168.0.0/24 --port=21,22,23,80,5900-5910");
     }
 
     var ips = [];
@@ -167,14 +167,13 @@ var defaultValues = function(argv) {
     if (!argv.timeout) {
         argv.timeout = 2000;
     }
+    return argv;
 }
 
 var help = function(optimist,argv) {
-    if (!argv.port && ! argv.geo && !argv.reverse) {
-        argv.help = true;
-    }
     if (argv.help) {
-        return optimist.showHelp();
+        optimist.showHelp();
+        process.exit(0);
     }
 
     if (argv.version||argv.about) {
@@ -183,7 +182,8 @@ var help = function(optimist,argv) {
     }
 
     if (argv.version) {
-        return console.log(package.version);
+        console.log(package.version);
+        process.exit(0);
     }
 
     if (argv.about) {
@@ -195,9 +195,9 @@ var help = function(optimist,argv) {
             'Author: '+package.author,'\n',
             'Repository: '+package.repository.url.replace(/git/,'http')
         );
-        return;
+        process.exit(0);
     }
-
+    return argv;
 }
 
 var takeCareOfCrazyPeople = function(argv,cb) {
@@ -212,49 +212,124 @@ var takeCareOfCrazyPeople = function(argv,cb) {
 }
 
 var parse = function(args,cb) {
-    var opts = process.argv;
-    if (typeof args == 'function') {
-        cb = args;
-    } else {
-        opts = args;
-    }
 
     var optimist = require('optimist')
         .usage('Usage: evilscan <fqdn|ipv4|cidr> [options]\n\nExample: evilscan 192.168.0.0/24 --port=21-23,80')
         .demand('_')
 
-        .describe('port','port(s) you want to scan, examples:\n--port=80\n--port=21,22\n--port=21,22,23,5900-5902\n')
-        .describe('reverse', 'display DNS reverse lookup')
-        .describe('reversevalid','only display results having a valid reverse dns, except if ports specified')
-        .describe('geo', 'display geoip (free maxmind)')
-        .describe('banner', 'display banner')
-        .describe('bannerraw', 'display raw banner (as a JSON Buffer)')
-        .describe('progress', 'display progress indicator each seconds\n')
-        .describe('status', 'ports status wanted in results (example --status=OT)\nT(timeout)\nR(refused)\nO(open, default)\nU(unreachable)\n')
-        .describe('scan', 'scan method\ntcpconnect (full connect, default)\ntcpsyn (half opened, not yet implemented)\nudp (not yet implemented)\n')
-        .describe('concurrency','max number of simultaneous socket opened\ndefault 500\n')
-        .describe('timeout','maximum number of milliseconds before closing the connection\ndefault 2000\n')
-        .describe('hugescan','allow number of ip/port combinaison greater than 16580355 (i.e a /24 network with port range 0-65535)')
-        .describe('display', 'display result format (json,xml,console)\ndefault console\n')
-        .describe('json', 'shortcut for --display=json')
-        .describe('xml', 'shortcut for --display=xml')
-        .describe('console', 'shortcut for --display=console')
-        .describe('help','display help')
-        .describe('about','display about')
-        .describe('version','display version number')
+        .describe(
+            'port',
+            'port(s) you want to scan, examples:\n'+
+            '--port=80\n'+
+            '--port=21,22\n'+
+            '--port=21,22,23,5900-5900\n'
+        )
+        .describe(
+            'reverse',
+            'display DNS reverse lookup'
+        )
+        .describe(
+            'reversevalid',
+            'only display results having a valid reverse dns, except if ports specified'
+        )
+        .describe(
+            'geo',
+            'display geoip (free maxmind)'
+        )
+        .describe(
+            'banner',
+            'display grabbed banner when available'
+        )
+        .describe(
+            'bannerraw',
+            'display raw banner (as a JSON Buffer)'
+        )
+        .describe(
+            'progress',
+            'display progress indicator each seconds\n'
+        )
+        .describe(
+            'status',
+            'ports status wanted in results (example --status=OT)\n'+
+            'T(timeout)\n'+
+            'R(refused)\n'+
+            'O(open, default)\n'+
+            'U(unreachable)\n'
+        )
+        .describe(
+            'scan',
+            'scan method\n'+
+            'tcpconnect (full connect, default)\n'+
+            'tcpsyn (half opened, not yet implemented)\n'+
+            'udp (not yet implemented)\n'
+        )
+        .describe(
+            'concurrency',
+            'max number of simultaneous socket opened\n'+
+            'default 500\n'
+        )
+        .describe(
+            'timeout',
+            'maximum number of milliseconds before closing the connection\n'+
+            'default 2000\n'
+        )
+        .describe(
+            'hugescan',
+            'allow number of ip/port combinaison greater than 16580355\n'+
+            '(i.e a /24 network with port range 0-65535)'
+        )
+        .describe(
+            'display',
+            'display result format (json,xml,console)\n'+
+            'default console\n'
+        )
+        .describe(
+            'json',
+            'shortcut for --display=json'
+        )
+        .describe(
+            'xml',
+            'shortcut for --display=xml'
+        )
+        .describe(
+            'console',
+            'shortcut for --display=console'
+        )
+        .describe(
+            'help',
+            'display help'
+        )
+        .describe(
+            'about',
+            'display about'
+        )
+        .describe(
+            'version',
+            'display version number'
+        )
         .wrap(80)
 
-    var argv = optimist.parse(opts);
+    var argv = optimist.parse(args);
 
-    help(optimist,argv);
-    defaultValues(argv);
+    // merge options when used in a node module
+    // because we are passing options without "--"
+    // like when using evilscan with the command line
+    for (var attr in args) {
+        argv[attr] = args[attr];
+    }
+
+    // we don't care about that
+    delete argv['$0'];
+
+    argv = help(optimist,argv);
+    argv = defaultValues(argv);
 
     async.series([
         function(next) {
-            getTargets(argv._[2]||opts.target,next);
+            getTargets(argv._[2]||args.target,next);
         },
         function(next) {
-            getPorts(argv.port||opts.port,next);
+            getPorts(argv.port||args.port,next);
         }
     ],function(err,result) {
 
