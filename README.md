@@ -23,7 +23,7 @@ Currently support :
 
 Roadmap
 --------
-(see github issues)
+(see github issues and changelog.md)
 * more and more tests
 * udp scan
 * syn scan
