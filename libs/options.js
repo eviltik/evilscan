@@ -243,6 +243,11 @@ var parse = function(args,cb) {
             'display raw banner (as a JSON Buffer)'
         )
         .describe(
+            'bannerlen',
+            'grabbed banner length in bytes\n'+
+            'default 150'
+        )
+        .describe(
             'progress',
             'display progress indicator each seconds\n'
         )

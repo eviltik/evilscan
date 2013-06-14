@@ -80,7 +80,7 @@ var checkPort = function(options, cb) {
 
     var host = options.ip||options.host;
     var port = options.port;
-    var snaplen = options.snaplen|| defaultSnapLen;
+    var snaplen = options.bannerlen || defaultSnapLen;
     var timeout = options.timeout || defaultSocketTimeout;
     var status = 'close';
     var banner = '';
@@ -108,6 +108,7 @@ var checkPort = function(options, cb) {
             banner = banner.replace(/\t/gm,'\\t');
             banner = banner.replace(/ *$/,'');
             banner = banner.replace(/^ */,'');
+            banner = banner.substr(0,snaplen);
         }
 
         var o = {
