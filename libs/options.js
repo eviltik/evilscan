@@ -170,6 +170,7 @@ var defaultValues = function(argv) {
 
 var help = function(optimist,argv) {
     if (argv.help) {
+        console.log(argv);
         optimist.showHelp();
         process.exit(0);
     }
