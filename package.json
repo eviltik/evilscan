@@ -1,7 +1,7 @@
 {
   "name": "evilscan",
   "version": "0.0.7",
-  "description": "Massive TCP ports scanner, evilscan is a mandatory addon for evilprobe project.",
+  "description": "Massive ports scanner for node.",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
