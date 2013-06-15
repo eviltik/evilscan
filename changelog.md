@@ -1,3 +1,11 @@
+v0.0.7 - 2013/06/15
+* fix --help
+
+v0.0.6 - 2013/06/15
+* cache DNS
+* cache Geoip
+* banner length option
+
 v0.0.5 - 2013/06/14
 ===================
 * Complete refactor
