@@ -68,6 +68,7 @@ var scanInstance = new evilscan(options,function(scanner) {
 
 Command line options
 -------
+```
 Usage: evilscan <fqdn|ipv4|cidr> [options]
 
 Example: evilscan 192.168.0.0/24 --port=21-23,80
