@@ -163,6 +163,18 @@ evilscan.prototype.initQueue = function() {
     });
 }
 
+evilscan.prototype.pause = function() {
+    if (this.paused) return;
+    this.paused = true;
+    this.q.pause(true);
+}
+
+evilscan.prototype.unpause = function() {
+    if (!this.paused) return;
+    this.paused = false;
+    this.q.pause(false);
+}
+
 evilscan.prototype.initQueuePause = function() {
     process.on('SIGUSR2',function() {
         if (!this.paused) {
