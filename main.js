@@ -165,8 +165,7 @@ evilscan.prototype.initQueue = function() {
 }
 
 evilscan.prototype.initQueuePause = function() {
-    process.on('SIGUSR1',function() {
-        //console.log('{"message":"Received SIGUSR1"}');
+    process.on('STOP',function() {
         if (!this.paused) {
             this.paused = true;
             this.lastMessage = 'Pause';
@@ -174,7 +173,7 @@ evilscan.prototype.initQueuePause = function() {
             this.paused = false
         }
         this.q.pause(this.paused);
-    });
+    }.bind(this));
 }
 
 evilscan.prototype.init = function() {

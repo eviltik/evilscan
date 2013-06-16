@@ -170,9 +170,9 @@ ulimit -u unlimited
 
 **Pause/unpause**
 
-You can pause/unpause a running scan by sending SIGUSR1 signal. First time it will pause the process, second time it will unpause it.
+You can pause/unpause a running scan by sending SIGUSR2 signal. First time it will pause the process, second time it will unpause it.
 ```
-kill -SIGUSR1 19859 # where 19859 is the pid of nodejs process running evilscan
+kill -SIGUSR2 19859 # where 19859 is the pid of nodejs process running evilscan
 ```
 
 Help needed
