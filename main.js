@@ -165,7 +165,7 @@ evilscan.prototype.initQueue = function() {
 }
 
 evilscan.prototype.initQueuePause = function() {
-    process.on('STOP',function() {
+    process.on('SIGUSR2',function() {
         if (!this.paused) {
             this.paused = true;
             this.lastMessage = 'Pause';
