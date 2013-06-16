@@ -27,7 +27,7 @@ suite(path.basename(__filename), function() {
     }
 
     var arr = [{
-        title:'should return a real result',
+        title:'should be pausable/unpausable',
         args:'./bin/evilscan.js 127.0.0.1 --port=0-6000 --json --progress --concurrency=10',
     }]
 
