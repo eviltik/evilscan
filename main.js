@@ -100,7 +100,6 @@ evilscan.prototype.initQueueProgress = function() {
     this.q.on('end',function() {
         clearInterval(self.progressTimer);
         self.fireProgress();
-        self.emit('done');
         if (self.cb) self.cb();
     });
 
