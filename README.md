@@ -8,6 +8,7 @@ Massive ip/port scanner (tcp connect). Work in progress.
 Status
 -------
 This program is young. I'm not a js expert. Feel free to fork and pull request !
+I'm on #evilprobe (freenode) times to times.
 
 Currently support :
 
