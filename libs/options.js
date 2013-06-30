@@ -200,9 +200,9 @@ var help = function(optimist,argv) {
 
 var takeCareOfCrazyPeople = function(argv,cb) {
     var count = argv.ips.length * argv.ports.length;
-    if (count>16580355 && !argv.force) {
+    if (count>16580355) {
         var msg = 'limit of 16580355 numbers of ip/port combinaison reached ('+count+')';
-        msg+=', use --hugescan if you really want to go on';
+        msg+=', see https://github.com/eviltik/evilscan/issues/25 for more information';
         cb(msg);
         return false;
     }

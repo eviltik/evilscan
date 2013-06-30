@@ -81,11 +81,16 @@ Options:
                   --port=21,22,23,5900-5902
                                                                                 
   --reverse       display DNS reverse lookup                                    
+  
   --reversevalid  only display results having a valid reverse dns, except if
                   ports specified                                               
+  
   --geo           display geoip (free maxmind)                                  
+  
   --banner        display banner                                                
+  
   --bannerraw     display raw banner (as a JSON Buffer)                         
+  
   --progress      display progress indicator each seconds
                                                                                 
   --status        ports status wanted in results (example --status=OT)
@@ -105,16 +110,19 @@ Options:
   --timeout       maximum number of milliseconds before closing the connection
                   default 2000
                                                                                 
-  --hugescan      allow number of ip/port combinaison greater than 16580355
-                  (i.e a /24 network with port range 0-65535)                   
   --display       display result format (json,xml,console)
                   default console
                                                                                 
   --json          shortcut for --display=json                                   
+  
   --xml           shortcut for --display=xml                                    
+  
   --console       shortcut for --display=console                                
+  
   --help          display help                                                  
+  
   --about         display about                                                 
+  
   --version       display version number                                        
 ```
 
@@ -168,6 +176,9 @@ On some linux, only 1024 opened sockets are allowed in the same time. To break t
 ```
 ulimit -u unlimited
 ```
+
+In all cases, due to #25, you will not be able to scan more than 16580355 ip addr at the moment.
+
 
 **Pause/unpause**
 
