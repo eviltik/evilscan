@@ -1,184 +1,160 @@
 var net = require('net');
-var socketTimeout = 10000; //miliseconds
-var defaultSocketTimeout = 10000; //miliseconds
-var defaultSnapLen = 512;
+var raw = require('raw-socket');
+var fs = require('fs');
+var stream = require('stream');
+var iac = require('./iac');
 
-var debug = false;
 
-var IAC={
-    ECHO:1,
-    SUPPRESS_GO_AHEAD:3,
-    STATUS:5,
-    TIMING_MARK:6,
-    TERMINAL_TYPE:24,
-    WINDOW_SIZE:31,
-    TERMINAL_SPEED:32,
-    REMOTE_FLOW_CONTROL:33,
-    LINEMODE: 34,
-    ENV_VARS: 36,
-    SE:0xF1,
-    NOP:0xF2,
-    DM:0xF3,
-    BRK:0xF4,
-    IP:0xF5,
-    AO:0xF6,
-    AYT:0xF7,
-    EC:0xF8,
-    GA:0xF9,
-    SB:0xFA,
-    WILL:0xFB,
-    WONT:0xFC,
-    DO:0xFD,
-    DONT:0xFE,
-    IAC:0xFF
-}
+var tcpconnect = function(opts) {
+    if (false === (this instanceof tcpconnect)) {
+        return new tcpconnect(opts);
+    }
 
-var handleIAC = function(buf,socket) {
-    var nbIAC = 0;
-    var count = 0;
-    var str = '';
-    for (var i = 0; i<buf.length;i++) {
-        if (buf[i] == IAC.IAC) {
-            count = 1;
-            nbIAC++;
-            str='IAC ';
-        } else if (count==1) {
-            switch (buf[i]) {
-                case IAC.DO:    str+='DO ';     break;
-                case IAC.DONT:  str+='DONT ';   break;
-                case IAC.WILL:  str+='WILL ';   break;
-                case IAC.WONT:  str+='WONT ';   break;
-            }
-            count++;
-        } else if (count==2) {
-            switch (buf[i]) {
-                case IAC.ECHO:                  str+='ECHO';                break;
-                case IAC.SUPPRESS_GO_AHEAD:     str+='SUPPRESS_GO_AHEAD';   break;
-                case IAC.STATUS:                str+='STATUS';              break;
-                case IAC.TIMING_MARK:           str+='TIMING_MARK';         break;
-                case IAC.TERMINAL_TYPE:         str+='TERMINAL_TYPE';       break;
-                case IAC.WINDOW_SIZE:           str+='WINDOW_SIZE';         break;
-                case IAC.TERMINAL_SPEED:        str+='TERMINAL_SPEED';      break;
-                case IAC.REMOTE_FLOW_CONTROL:   str+='REMOTE_FLOW_CONTROL'; break;
-                case IAC.LINEMODE:              str+='LINEMODE';            break;
-                case IAC.ENV_VARS:              str+='ENV_VARS';            break;
-                default:                        str+='UNKNOW';              break;
-            }
-            var nbuf = new Buffer([IAC.IAC,IAC.WONT,buf[i]]);
-            socket.write(nbuf);
-            buf.slice(count*nbIAC);
+
+    this.debug = false;
+
+    this.cb = null;
+
+    this.opts = opts;
+    this.opts.bannerlen = opts.bannerlen || 512;
+    this.opts.timeout = opts.timeout || 2000;
+
+    this.result = {
+        ip:opts.ip,
+        port:opts.port,
+        bannerraw:[],
+        banner:'',
+        status:null,
+        opened:false
+    }
+
+    this.socket = null;
+    this.bufArray = [];
+
+    /*
+    var handlerModules = fs.readdirSync(__dirname+'/probes/');
+    var handlers = [];
+
+    for (var i = 0;i<handlerModules.length;i++) {
+        var filename = handlerModules[i];
+        if (filename.match(/\.js$/)) {
+            var handler = require('./probes/'+filename);
+            handlers.push(handler);
         }
     }
-    return buf.slice(nbIAC*3);
+    */
 }
 
-var log = function(msg) {
-    if (debug) console.log(msg);
+tcpconnect.prototype.log = function(msg) {
+    if (this.debug) console.log('tcpconnect: '+this.ip+':'+this.port+': '+msg);
 }
 
-var checkPort = function(options, cb) {
+tcpconnect.prototype.formatBanner = function(str) {
+    // Convert to utf-8,
+    // encode special chars
+    // remove trailing spaces
+    str = new (require('string_decoder').StringDecoder)('utf-8').write(str);
+    str = str.toString();
+    str = str.replace(/\n/gm,'\\n');
+    str = str.replace(/\r/gm,'\\r');
+    str = str.replace(/\t/gm,'\\t');
+    str = str.replace(/ *$/,'');
+    str = str.replace(/^ */,'');
+    str = str.substr(0,this.opts.bannerlen);
+    return str;
+}
 
-    var host = options.ip||options.host;
-    var port = options.port;
-    var snaplen = options.bannerlen || defaultSnapLen;
-    var timeout = options.timeout || defaultSocketTimeout;
-    var status = 'close';
-    var banner = '';
-    var raws = [];
-    var http = options.http;
-    var opened = false;
+tcpconnect.prototype.sendResult = function(timeouted) {
+    this.log('onEnd');
 
-    var onClose = function() {
+    if (this.bufArray.length) {
+        this.result.raw = Buffer.concat(this.bufArray);
+    }
 
-        log(host+':'+port+' closing');
+    if (this.result.banner) {
+        this.result.banner = this.formatBanner(this.result.banner);
+    }
 
-        var raw = null;
-        if (raws.length) {
-            raw = Buffer.concat(raws);
-        }
-
-        if (banner) {
-            // Convert to utf-8,
-            // encode special chars
-            // remove trailing spaces
-            banner = new (require('string_decoder').StringDecoder)('utf-8').write(banner);
-            banner = banner.toString();
-            banner = banner.replace(/\n/gm,'\\n');
-            banner = banner.replace(/\r/gm,'\\r');
-            banner = banner.replace(/\t/gm,'\\t');
-            banner = banner.replace(/ *$/,'');
-            banner = banner.replace(/^ */,'');
-            banner = banner.substr(0,snaplen);
-        }
-
-        var o = {
-            host:host,
-            port:port,
-            status:status,
-            banner:banner,
-            raw:JSON.stringify(raw)
-        }
-
-        log(host+':'+port+' '+JSON.stringify(o));
-
-        socket.destroy();
-        delete socket;
-        cb(null,o);
-    };
-
-    var socket = new net.createConnection(port, host);
-    socket.removeAllListeners('timeout');
-    socket.setTimeout(timeout);
-
-    socket.on('close', function() {
-        if (!banner) opened = false;
-        onClose();
-    });
-
-    socket.on('error', function(e) {
-        if (e.message.match(/ECONNREFUSED/)) {
-            return status = 'close (refused)';
-        }
-        if (e.message.match(/EHOSTUNREACH/)) {
-            return status = 'close (unreachable)';
-        }
-        status = e.message;
-    });
-
-    socket.on('connect', function() {
-        log(host+':'+port+' connected');
-        opened = true;
-    });
-
-    socket.on('timeout',function() {
-        log(host+':'+port+' socket timeout (opened '+opened+')');
-        if (!opened) {
-            status = 'close (timeout)';
-        } else {
-            status = 'open';
-        }
-        socket.destroy();;
-    });
-
-    socket.on('data',function(buf) {
-        raws.push(buf);
-        buf = handleIAC(buf,socket);
-        if (banner.length < snaplen) {
-            var d = buf.toString('ascii');
-            if (d) {
-                log(host+':'+port+' data: '+buf.toString('ascii').replace(/[\n\r]/,' '));
+    if (!this.result.status) {
+        if (!this.result.opened) {
+            if (timeouted) {
+                this.result.status = 'timeout';
+            } else {
+                this.result.status =' close';
             }
-            return banner += buf.toString('ascii');
+        } else {
+            this.result.status = 'open';
         }
-        socket.destroy();
-    });
+    }
+
+    this.log(JSON.stringify(this.result));
+    this.socket.destroy();
+    delete this.socket;
+    this.cb(null,this.result);
 }
 
-var setSocketTimeout = function(t) {
-    socketTimeout = t;
+tcpconnect.prototype.onClose = function() {
+    if (!this.result.banner) {
+        this.result.opened = false;
+    }
+    this.sendResult();
 }
 
-module.exports = {
-    checkPort:checkPort,
-    setSocketTimeout:setSocketTimeout
+tcpconnect.prototype.onError = function(e) {
+    if (e.message.match(/ECONNREFUSED/)) {
+        return this.result.status = 'close (refused)';
+    }
+    if (e.message.match(/EHOSTUNREACH/)) {
+        return this.result.status = 'close (unreachable)';
+    }
+    this.result.status = e.message;
 }
+
+tcpconnect.prototype.onConnect = function(e) {
+    this.log('connected');
+    this.result.opened = true;
+}
+
+tcpconnect.prototype.onTimeout = function() {
+    this.log('socket timeout (opened '+this.result.opened+')');
+    if (!this.result.opened) {
+        this.result.status = 'close (timeout)';
+    } else {
+        this.result.status = 'open';
+    }
+    this.socket.destroy();;
+}
+
+tcpconnect.prototype.onData = function(buf) {
+    this.bufArray.push(buf);
+    buf = iac.negotiate(buf,this.socket);
+    if (this.result.banner.length < this.opts.bannerlen) {
+        var d = buf.toString('ascii');
+        if (d) this.log(d.replace(/[\n\r]/,' '));
+        return this.result.banner += d;
+    }
+    this.socket.destroy();
+}
+
+tcpconnect.prototype.analyzePort = function(cb) {
+
+    //console.log('scanning '+host+':'+port);
+
+    this.cb = cb;
+
+    this.socket = net.createConnection(this.opts.port, this.opts.ip);
+    this.socket.removeAllListeners('timeout');
+    this.socket.setTimeout(this.opts.timeout);
+
+    this.socket.on('close', this.onClose.bind(this));
+    this.socket.on('error', this.onError.bind(this));
+    this.socket.on('connect', this.onConnect.bind(this));
+    this.socket.on('timeout', this.onTimeout.bind(this));
+    this.socket.on('data', this.onData.bind(this));
+}
+
+tcpconnect.prototype.setSocketTimeout = function(t) {
+    this.opts.timeout = t;
+}
+
+module.exports = tcpconnect;
