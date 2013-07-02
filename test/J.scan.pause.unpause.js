@@ -28,7 +28,7 @@ suite(path.basename(__filename), function() {
 
     var arr = [{
         title:'should be pausable/unpausable',
-        args:'./bin/evilscan.js 127.0.0.1 --port=0-6000 --json --progress --concurrency=10',
+        args:'./bin/evilscan.js 127.0.0.1/24 --port=0-25 --json --progress --concurrency=10',
     }]
 
     // simulate command line
@@ -50,8 +50,7 @@ suite(path.basename(__filename), function() {
             linereaderStdout.on('line',function(data) {
                 checkResult(data);
                 data = JSON.parse(data);
-                if (data._jobsDone > 1000 && !paused && !unpaused) {
-
+                if (data._jobsDone > 100 && !paused && !unpaused) {
                     // let's send pause signal
 
                     proc.kill('SIGUSR2');
@@ -64,7 +63,6 @@ suite(path.basename(__filename), function() {
                     // running task is 0
 
                     if (data._status && data._status.match(/paused/i)) {
-
                         // let's send unpause signal
 
                         unpaused = true;
@@ -73,6 +71,7 @@ suite(path.basename(__filename), function() {
                 } else if (unpaused) {
                     if (data._status && data._status.match(/running/i)) {
                         pausedunpaused = true;
+                        proc.kill('SIGKILL');
                     }
                 }
                 checked = true;
@@ -89,6 +88,7 @@ suite(path.basename(__filename), function() {
 
         });
     });
+
 
     // simulate module usage
 
@@ -119,43 +119,33 @@ suite(path.basename(__filename), function() {
             var unpaused = false;
             var pausedunpaused = false;
 
-            var scan = new evilscan(argv,function(s) {
-
-                s.on('error',function(err) {
+            new evilscan(argv)
+                .on('error',function(err) {
                     throw new Error(data.toString());
-                });
-
-                s.on('done',function() {
+                })
+                .on('done',function() {
                     expect(pausedunpaused,'pause/unpause should be true').to.be.ok;
                     next();
-                });
-
-                s.on('progress',function(data) {
-                    if (data._jobsDone > 1000 && !paused && !unpaused) {
-
+                })
+                .on('progress',function(data) {
+                    if (data._jobsDone > 100 && !paused && !unpaused) {
                         // let's send pause signal
-
-                        s.pause();
+                        this.pause();
                         paused = true;
-
                     } else if (paused && !unpaused) {
-
                         if (data._status && data._status.match(/paused/i)) {
-
                             // let's send unpause signal
-
                             unpaused = true;
-                            s.unpause();
+                            this.unpause();
                         }
                     } else if (unpaused) {
                         if (data._status && data._status.match(/running/i)) {
                             pausedunpaused = true;
+                            this.abort();
                         }
                     }
-                });
-
-                s.run();
-            });
+                })
+                .run();
         });
     });
 });
