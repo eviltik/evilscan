@@ -7,7 +7,7 @@ var dns = require('dns');
 var async = require('async');
 
 var City = require('geoip').City;
-var geoip = new City(__dirname+'/geoip/GeoLiteCity.dat');
+var geoip = new City(__dirname+'/share/GeoLiteCity.dat');
 
 
 var evilscan = function(opts,cb) {
