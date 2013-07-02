@@ -1,5 +1,4 @@
 var net = require('net');
-var raw = require('raw-socket');
 var fs = require('fs');
 var stream = require('stream');
 var iac = require('./iac');
