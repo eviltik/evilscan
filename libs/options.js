@@ -245,7 +245,7 @@ var parse = function(args,cb) {
         .describe(
             'bannerlen',
             'grabbed banner length in bytes\n'+
-            'default 150'
+            'default 512'
         )
         .describe(
             'progress',

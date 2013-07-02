@@ -88,7 +88,10 @@ Options:
   --geo           display geoip (free maxmind)                                  
   
   --banner        display banner                                                
-  
+ 
+  --bannerlen     set banner length grabing
+                  default 512
+
   --bannerraw     display raw banner (as a JSON Buffer)                         
   
   --progress      display progress indicator each seconds
