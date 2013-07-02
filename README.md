@@ -42,39 +42,46 @@ Install
 Use evilscan as a node module
 -----------
 ```
-var evilscan = require('evilscan');
+var evilscan = require('./');
 
-// options are the same as described below in this page
-var options = {};
+var options = {
+    target:'127.0.0.1',
+    port:'21-23',
+    status:'TROU', // Timeout, Refused, Open, Unreachable
+    banner:true
+};
 
-var scanInstance = new evilscan(options,function(scanner) {
+var scanner = new evilscan(options);
 
-    scanner.on('result',function(data) {
-        // for each item matching options ...
-        console.log(data);
-    });
-                
-    scanner.on('error',function(err) {
-        throw new Error(data.toString());
-    });
-                
-    scanner.on('done',function() {
-        // finished !
-    });
-                
-    scanner.run();
+scanner.on('result',function(data) {
+        // fired when item is matching options
+            console.log(data);
 });
 
+scanner.on('error',function(err) {
+        throw new Error(data.toString());
+});
+
+scanner.on('done',function() {
+        // finished !
+});
+
+scanner.run();
+
 ```
 
-Command line options
+Use evilscan as a command line tool
+-----------
+Usage: evilscan <fqdn|ipv4|cidr> [options]
+Example:
+```
+root@debian:~# evilscan 192.168.0.0/24 --port=21-23,80
+```
+
+
+Options
 -------
 ```
-Usage: evilscan <fqdn|ipv4|cidr> [options]
-
-Example: evilscan 192.168.0.0/24 --port=21-23,80
-
-Options:
   --port          port(s) you want to scan, examples:
                   --port=80
                   --port=21,22
@@ -129,7 +136,7 @@ Options:
   --version       display version number                                        
 ```
 
-Example usage
+Samples output
 ----------------
 
 * Every ports on localhost, grab banner, display only opened ports 
