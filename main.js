@@ -36,15 +36,13 @@ var evilscan = function(opts,cb) {
             self.options = opts;
             self.init();
             events.call(self);
-            cb(self);
+            if (cb) cb(self);
         });
     } else {
         this.init();
         events.call(this);
     }
 }
-
-
 
 util.inherits(evilscan, events);
 
@@ -76,13 +74,6 @@ evilscan.prototype.fireProgress = function() {
     }
 
     this.progress = o._progress;
-    /*
-    if (argv.json) {
-        console.log(JSON.stringify(o));
-    } else {
-        process.stdout.write(printf("\r%s (%s%)",lastMessage,o._progress));
-    }
-    */
     this.emit('progress',o);
 }
 
@@ -94,6 +85,7 @@ evilscan.prototype.initQueueProgress = function() {
     this.progressTimer = setInterval(self.fireProgress.bind(this),1000);
 
     this.q.on('start',function() {
+        self.emit('start');
         self.fireProgress();
     });
 
@@ -160,6 +152,12 @@ evilscan.prototype.initQueue = function() {
         if (data.port) str+=':'+data.port;
         self.lastMessage = str;
         self.emit('scan',data);
+    });
+
+    this.q.on('jobEnd',function(data) {
+        var str = 'Scanned '+data.ip;
+        if (data.port) str+=':'+data.port;
+        self.lastMessage = str;
     });
 }
 
@@ -243,13 +241,17 @@ evilscan.prototype.lookupDns = function(ip,cb) {
 evilscan.prototype.portScan = function(ip,port,cb) {
     if (!port) return cb();
     if (port == 0) return cb();
+
     var args = {
-        ip:ip,
-        port:port,
-        snaplen:512,
-        timeout:this.options.timeout
+        ip : ip,
+        port : port,
+        banner : this.options.banner,
+        bannerlen : this.options.bannerlen,
+        timeout : this.options.timeout
     }
-    tcpconnect.checkPort(args,cb);
+
+    var t = new tcpconnect(args);
+    t.analyzePort(cb);
 }
 
 evilscan.prototype.resultAddGeo = function(result,r) {
@@ -381,10 +383,14 @@ evilscan.prototype.scan = function(args,nextIteration) {
 }
 
 evilscan.prototype.run = function(cb) {
-    var self = this;
     this.cbrun = cb;
-    this.emit('run');
-    return this.q.run();
+    this.q.run();
+    return;
+}
+
+evilscan.prototype.abort = function() {
+    this.q.abort();
+    return;
 }
 
 evilscan.prototype.getInfo = function() {
