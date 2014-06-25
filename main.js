@@ -5,9 +5,7 @@ var options = require('./libs/options');
 
 var dns = require('dns');
 var async = require('async');
-
-var City = require('geoip').City;
-var geoip = new City(__dirname+'/share/GeoLiteCity.dat');
+var geoip = require('geoip-lite');
 
 
 var evilscan = function(opts,cb) {
@@ -208,7 +206,8 @@ evilscan.prototype.lookupGeo = function(ip,cb) {
         return cb(null,this.cacheGeo[ip]);
     }
 
-    geoip.lookup(ip,cb);
+    var geo = geoip.lookup(ip);
+    cb(null, geo);
 }
 
 evilscan.prototype.lookupDns = function(ip,cb) {
@@ -259,6 +258,7 @@ evilscan.prototype.resultAddGeo = function(result,r) {
 
     r.city = '';
     r.country = '';
+    r.region = '',
     r.latitude = '';
     r.longitude = '';
 
@@ -268,8 +268,9 @@ evilscan.prototype.resultAddGeo = function(result,r) {
 
     r.city = result.city || '';
     r.country = result.country_name || '';
-    r.latitude = result.latitude || '';
-    r.longitude = result.longitude || '';
+    r.region = result.region || '',
+    r.latitude = result.ll[0] || '';
+    r.longitude = result.ll[1] || '';
 
     return r;
 }
