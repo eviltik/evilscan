@@ -29,10 +29,43 @@ var getTargets = function(target,cb) {
 
         target = result[0][0]+'';
 
+        if (target.match(/\-/)) {
+            var splitTarget = target.split('-'),
+                minHost     = splitTarget[0],
+                ips         = [],
+                splitMinHost, maxHost;
+
+            if (net.isIPv4(minHost)) {
+                splitMinHost = minHost.split('.');
+                if (net.isIPv4(splitTarget[1])) {
+                    maxHost = splitTarget[1].split('.')[3];
+                } else {
+                    // Check if the string is a positive integer
+                    if (splitTarget[1] >>> 0 === parseFloat(splitTarget[1])) {
+                        maxHost = splitTarget[1];
+                    } else {
+                        return cb("Invalid IPv4 target range, ie: 192.168.0.1-5, 192.168.0.1-192.168.0.5");
+                    }
+                }
+            } else {
+                return cb("Invalid IPv4 target. ie: 192.168.0.1-5, 192.168.0.1-192.168.0.5");
+            }
+
+            for (i = parseInt(splitMinHost[3]); i <= parseInt(maxHost); i++) { 
+                ips.push(splitMinHost[0] + '.' + splitMinHost[1] + '.' +
+                         splitMinHost[2] + '.' + i);
+            }
+
+            if (!ips) {
+                return cb("Invalid IPv4 target. Please specify a target using --target [cidr|ip|range]");
+            }
+            return cb(null,ips);
+        }
+
         if (target.match(/\//)) {
             var ips = cidr.get(target);
             if (!ips) {
-                return cb("Invalid IPv4 CIDR target. Please specify a target using --target [cidr|ip]");
+                return cb("Invalid IPv4 CIDR target. Please specify a target using --target [cidr|ip|range]");
             }
             return cb(null,ips);
         }
