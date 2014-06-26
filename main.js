@@ -267,7 +267,7 @@ evilscan.prototype.resultAddGeo = function(result,r) {
     this.cacheGeo[r.ip] = result;
 
     r.city = result.city || '';
-    r.country = result.country_name || '';
+    r.country = result.country || '';
     r.region = result.region || '',
     r.latitude = result.ll[0] || '';
     r.longitude = result.ll[1] || '';

@@ -29,12 +29,13 @@ suite(path.basename(__filename), function() {
     var arr = [{
         title:'should return a real result',
         args:'./bin/evilscan.js 173.194.45.67 --geo --json',
-        data:{
-            ip:'173.194.45.67',
-            city:'Mountain View',
-            country:'United States',
-            latitude:37.4192008972168,
-            longitude:-122.05740356445312
+        data: {
+            ip: '173.194.45.67',
+            city: 'Mountain View',
+            country: 'US',
+            region: 'CA',
+            latitude: 37.4192,
+            longitude: -122.0574
         }
     }]
 
