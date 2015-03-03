@@ -4,7 +4,7 @@
   "description": "Massive ports scanner for node.",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "make test"
   },
   "bin": {
     "evilscan": "./bin/evilscan.js"
@@ -29,19 +29,16 @@
   },
   "dependencies": {
     "async": "latest",
+    "findup-sync": "^0.2.1",
     "geoip-lite": "latest",
     "optimist": "0.5.0",
     "printf": "latest",
     "qjobs": "latest",
     "winston": "latest"
   },
-  "scripts":{
-      "test":"make test"
-  },
-
   "devDependencies": {
-    "chai":"latest",
-    "mocha":"latest",
-    "sol-telnet":"latest"
+    "chai": "latest",
+    "mocha": "latest",
+    "sol-telnet": "latest"
   }
 }

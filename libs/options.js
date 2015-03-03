@@ -2,6 +2,7 @@ var net = require('net');
 var cidr = require('./cidr');
 var dns = require('dns');
 var async = require('async');
+var findup = require('findup-sync'); 
 
 var getTargets = function(target,cb) {
 
@@ -209,7 +210,7 @@ var help = function(optimist,argv) {
 
     if (argv.version||argv.about) {
         var fs = require('fs');
-        var package = JSON.parse(fs.readFileSync(__dirname+'/package.json'));
+        var package = JSON.parse(fs.readFileSync(findup('package.json')));
     }
 
     if (argv.version) {
