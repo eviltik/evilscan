@@ -27,7 +27,7 @@ suite(path.basename(__filename), function() {
 
     var arr = [{
         title:'should return many dns results',
-        args:'./bin/evilscan.js 173.194.40.162/29 --json --reverse'
+        args:'./bin/evilscan.js 216.58.208.227/29 --json --reverse'
     }]
 
     /* simulate command line */
