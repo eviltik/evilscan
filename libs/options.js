@@ -176,7 +176,7 @@ var help = function(optimist,argv) {
 
     if (argv.version||argv.about) {
         var fs = require('fs');
-        var package = JSON.parse(fs.readFileSync('package.json'));
+        var package = JSON.parse(fs.readFileSync(__dirname+'/package.json'));
     }
 
     if (argv.version) {
