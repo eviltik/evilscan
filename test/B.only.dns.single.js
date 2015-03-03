@@ -31,7 +31,7 @@ suite(path.basename(__filename), function() {
         args:'./bin/evilscan.js 64.4.11.37 --reverse --json',
         data:{
             ip:'64.4.11.37',
-            reverse:"00001001.ch"
+            reverse:"perceptivepixel.com"
         }
     }]
 
