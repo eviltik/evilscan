@@ -9,7 +9,7 @@ suite(path.basename(__filename), function() {
 
     test('target: no target specified',function() {
         getTargets(null,function(err,r) {
-            expect(err).to.match(/--target/);
+            expect(err).to.match(/target/);
             expect(r).to.be.equal(undefined);
         });
     });
