@@ -7,7 +7,7 @@ var findup = require('findup-sync');
 var getTargets = function(target,cb) {
 
     if (!target) {
-        return cb("Please specify at least a target using --target [cidr|ipv4|host], example:\nevilscan 192.168.0.0/24 --port=21,22,23,80,5900-5910");
+        return cb("Please specify at least a target [cidr|ipv4|host], example:\nevilscan 192.168.0.0/24 --port=21,22,23,80,5900-5910");
     }
 
     var ips = [];
