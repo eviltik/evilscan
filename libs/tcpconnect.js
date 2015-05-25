@@ -79,7 +79,7 @@ tcpconnect.prototype.sendResult = function(timeouted) {
             if (timeouted) {
                 this.result.status = 'timeout';
             } else {
-                this.result.status =' close';
+                this.result.status =' closed';
             }
         } else {
             this.result.status = 'open';
@@ -101,10 +101,10 @@ tcpconnect.prototype.onClose = function() {
 
 tcpconnect.prototype.onError = function(e) {
     if (e.message.match(/ECONNREFUSED/)) {
-        return this.result.status = 'close (refused)';
+        return this.result.status = 'closed (refused)';
     }
     if (e.message.match(/EHOSTUNREACH/)) {
-        return this.result.status = 'close (unreachable)';
+        return this.result.status = 'closed (unreachable)';
     }
     this.result.status = e.message;
 }
@@ -117,7 +117,7 @@ tcpconnect.prototype.onConnect = function(e) {
 tcpconnect.prototype.onTimeout = function() {
     this.log('socket timeout (opened '+this.result.opened+')');
     if (!this.result.opened) {
-        this.result.status = 'close (timeout)';
+        this.result.status = 'closed (timeout)';
     } else {
         this.result.status = 'open';
     }
