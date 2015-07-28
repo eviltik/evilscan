@@ -28,7 +28,7 @@
     "url": "https://github.com/eviltik/evilscan/issues"
   },
   "dependencies": {
-    "async": "latest",
+    "async": "1.0.0",
     "findup-sync": "^0.2.1",
     "geoip-lite": "latest",
     "optimist": "0.5.0",
