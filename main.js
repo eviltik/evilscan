@@ -1,3 +1,4 @@
+'use strict';
 var util = require('util');
 var events = require('events').EventEmitter;
 var tcpconnect = require('./libs/tcpconnect');

@@ -2,7 +2,7 @@ var net = require('net');
 var cidr = require('./cidr');
 var dns = require('dns');
 var async = require('async');
-var findup = require('findup-sync'); 
+var findup = require('findup-sync');
 
 var getTargets = function(target,cb) {
 
@@ -52,7 +52,7 @@ var getTargets = function(target,cb) {
                 return cb("Invalid IPv4 target. ie: 192.168.0.1-5, 192.168.0.1-192.168.0.5");
             }
 
-            for (i = parseInt(splitMinHost[3]); i <= parseInt(maxHost); i++) { 
+            for (i = parseInt(splitMinHost[3]); i <= parseInt(maxHost); i++) {
                 ips.push(splitMinHost[0] + '.' + splitMinHost[1] + '.' +
                          splitMinHost[2] + '.' + i);
             }
@@ -210,22 +210,22 @@ var help = function(optimist,argv) {
 
     if (argv.version||argv.about) {
         var fs = require('fs');
-        var package = JSON.parse(fs.readFileSync(findup('package.json')));
+        var pkg = JSON.parse(fs.readFileSync(findup('pkg.json')));
     }
 
     if (argv.version) {
-        console.log(package.version);
+        console.log(pkg.version);
         process.exit(0);
     }
 
     if (argv.about) {
         console.log(
-            package.name,
-            package.version,'\n',
-            'Resume: '+package.description,'\n',
-            'License: '+package.license,'\n',
-            'Author: '+package.author,'\n',
-            'Repository: '+package.repository.url.replace(/git/,'http')
+            pkg.name,
+            pkg.version,'\n',
+            'Resume: '+pkg.description,'\n',
+            'License: '+pkg.license,'\n',
+            'Author: '+pkg.author,'\n',
+            'Repository: '+pkg.repository.url.replace(/git/,'http')
         );
         process.exit(0);
     }
