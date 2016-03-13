@@ -25,7 +25,7 @@ options.parse(process.argv,function(err,options) {
         if (!options.json) {
             console.log();
         }
-    })
+    });
 
     scan.on('error',function(err) {
         console.log(err);
