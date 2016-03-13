@@ -87,7 +87,7 @@ var getTargets = function(target,cb) {
 
         return cb("Target: unknow error");
     });
-}
+};
 
 
 var addPortRange = function(range,ports) {
@@ -102,7 +102,7 @@ var addPortRange = function(range,ports) {
         }
     }
     return true;
-}
+};
 
 var getPorts = function(port,cb) {
     var ports = [];
@@ -128,12 +128,12 @@ var getPorts = function(port,cb) {
         if (!addPortRange(port,ports)) {
             ports.push(parseInt(port));
         }
-    })
+    });
 
     if (ports.length) return cb(null,ports);
 
     return cb('Port: unknow error');
-}
+};
 
 var defaultValues = function(argv) {
     if (!argv.concurrency) {
@@ -200,7 +200,7 @@ var defaultValues = function(argv) {
         argv.timeout = 2000;
     }
     return argv;
-}
+};
 
 var help = function(optimist,argv) {
     if (argv.help) {
@@ -230,7 +230,7 @@ var help = function(optimist,argv) {
         process.exit(0);
     }
     return argv;
-}
+};
 
 var takeCareOfCrazyPeople = function(argv,cb) {
     var count = argv.ips.length * argv.ports.length;
@@ -241,7 +241,7 @@ var takeCareOfCrazyPeople = function(argv,cb) {
         return false;
     }
     return true;
-}
+};
 
 var parse = function(args,cb) {
 
@@ -344,7 +344,7 @@ var parse = function(args,cb) {
             'version',
             'display version number'
         )
-        .wrap(80)
+        .wrap(80);
 
     var argv = optimist.parse(args);
 
@@ -375,15 +375,20 @@ var parse = function(args,cb) {
         argv.ips = result[0];
         argv.ports = result[1];
 
+        if (!argv.port) {
+            var msg = 'Please specify at least one port, --port=80';
+            return cb(msg);
+        }
+
         takeCareOfCrazyPeople(argv,cb);
 
         cb(null,argv);
     });
-}
+};
 
 
 module.exports = {
     getTargets:getTargets,
     getPorts:getPorts,
     parse:parse
-}
+};
