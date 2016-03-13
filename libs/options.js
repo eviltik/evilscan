@@ -375,7 +375,7 @@ var parse = function(args,cb) {
         argv.ips = result[0];
         argv.ports = result[1];
 
-        if (!argv.port) {
+        if (!argv.port && !argv.reverse && !argv.geo) {
             var msg = 'Please specify at least one port, --port=80';
             return cb(msg);
         }
