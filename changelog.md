@@ -1,3 +1,16 @@
+v1.0.2 - 2016/03/13
+* fix #39 (display ip list when no port specified)
+* merge #38 (async version)
+* fix SPDX license expression in package.json
+* use static version module in package.json
+
+v1.0.1 - 2015/03/03
+
+v1.0.0 - forgot to update changelog, omfg
+* release 1.0
+
+v0.0.9 - forgot to update changelog, shit
+
 v0.0.8 - 2013/06/16
 * fix #23 (SIGUSR2 rather than SIGUSR1)
 * fix #24 (done event fired twice)
