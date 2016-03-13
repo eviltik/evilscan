@@ -40,13 +40,13 @@ var evilscan = function(opts,cb) {
         this.init();
         events.call(this);
     }
-}
+};
 
 util.inherits(evilscan, events);
 
 evilscan.prototype.getOptions = function() {
     return this.options;
-}
+};
 
 evilscan.prototype.initTestLocalhost = function() {
     if (
@@ -59,7 +59,7 @@ evilscan.prototype.initTestLocalhost = function() {
         // so let's make a pause between each pools
         this.q.setInterval(1000);
     }
-}
+};
 
 
 evilscan.prototype.fireProgress = function() {
@@ -73,7 +73,7 @@ evilscan.prototype.fireProgress = function() {
 
     this.progress = o._progress;
     this.emit('progress',o);
-}
+};
 
 evilscan.prototype.initQueueProgress = function() {
     if (!this.options.progress) return;
@@ -93,7 +93,7 @@ evilscan.prototype.initQueueProgress = function() {
         if (self.cb) self.cb();
     });
 
-}
+};
 
 evilscan.prototype.initQueue = function() {
 
@@ -157,19 +157,19 @@ evilscan.prototype.initQueue = function() {
         if (data.port) str+=':'+data.port;
         self.lastMessage = str;
     });
-}
+};
 
 evilscan.prototype.pause = function() {
     if (this.paused) return;
     this.paused = true;
     this.q.pause(true);
-}
+};
 
 evilscan.prototype.unpause = function() {
     if (!this.paused) return;
     this.paused = false;
     this.q.pause(false);
-}
+};
 
 evilscan.prototype.initQueuePause = function() {
     process.on('SIGUSR2',function() {
@@ -181,7 +181,7 @@ evilscan.prototype.initQueuePause = function() {
         }
         this.q.pause(this.paused);
     }.bind(this));
-}
+};
 
 evilscan.prototype.init = function() {
 
@@ -194,7 +194,7 @@ evilscan.prototype.init = function() {
     this.initQueueProgress();
     this.initQueuePause();
     //portscan.setSocketTimeout(argv.timeout||1000);
-}
+};
 
 evilscan.prototype.lookupGeo = function(ip,cb) {
 
@@ -208,7 +208,7 @@ evilscan.prototype.lookupGeo = function(ip,cb) {
 
     var geo = geoip.lookup(ip);
     cb(null, geo);
-}
+};
 
 evilscan.prototype.lookupDns = function(ip,cb) {
     var self = this;
@@ -235,7 +235,7 @@ evilscan.prototype.lookupDns = function(ip,cb) {
         if (!domains.length) return cb(null);
         cb(null,domains[0]);
     });
-}
+};
 
 evilscan.prototype.portScan = function(ip,port,cb) {
     if (!port) return cb();
@@ -247,18 +247,18 @@ evilscan.prototype.portScan = function(ip,port,cb) {
         banner : this.options.banner,
         bannerlen : this.options.bannerlen,
         timeout : this.options.timeout
-    }
+    };
 
     var t = new tcpconnect(args);
     t.analyzePort(cb);
-}
+};
 
 evilscan.prototype.resultAddGeo = function(result,r) {
     if (!this.options.geo) return r;
 
     r.city = '';
     r.country = '';
-    r.region = '',
+    r.region = '';
     r.latitude = '';
     r.longitude = '';
 
@@ -268,12 +268,12 @@ evilscan.prototype.resultAddGeo = function(result,r) {
 
     r.city = result.city || '';
     r.country = result.country || '';
-    r.region = result.region || '',
+    r.region = result.region || '';
     r.latitude = result.ll[0] || '';
     r.longitude = result.ll[1] || '';
 
     return r;
-}
+};
 
 evilscan.prototype.resultAddDns = function(result,r) {
     if (!this.options.reverse || !r) return r;
@@ -284,13 +284,13 @@ evilscan.prototype.resultAddDns = function(result,r) {
     this.cacheDns[r.ip] = result;
 
     return r;
-}
+};
 
 evilscan.prototype.resultAddPort = function(result,r) {
 
-    if (!r || !this.options.port || !result) return r;;
-
-    //console.log(r,result);
+    if (!r || !this.options.port || !result) {
+        return r;
+    }
 
     if (!this.options.showTimeout && result.status.match(/timeout/i)) {
         return r = null;
@@ -319,10 +319,12 @@ evilscan.prototype.resultAddPort = function(result,r) {
     r.status = result.status;
 
     return r;
-}
+};
 
 evilscan.prototype.resultClean = function(r) {
-    if (!r) return r;
+    if (!r) {
+        return r;
+    }
 
     if (this.options.reverse && this.options.reversevalid && r.reverse == '') {
         r = null;
@@ -350,7 +352,7 @@ evilscan.prototype.resultClean = function(r) {
         }
     }
     return r;
-}
+};
 
 evilscan.prototype.scan = function(args,nextIteration) {
 
@@ -381,21 +383,21 @@ evilscan.prototype.scan = function(args,nextIteration) {
         }
         nextIteration();
     });
-}
+};
 
 evilscan.prototype.run = function(cb) {
     this.cbrun = cb;
     this.q.run();
     return;
-}
+};
 
 evilscan.prototype.abort = function() {
     this.q.abort();
     return;
-}
+};
 
 evilscan.prototype.getInfo = function() {
     return this.info;
-}
+};
 
-module.exports = evilscan
+module.exports = evilscan;
