@@ -50,7 +50,3 @@ options.parse(process.argv,function(err,options) {
 
     scan.run();
 });
-
-
-
-
