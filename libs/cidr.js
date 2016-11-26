@@ -57,5 +57,3 @@ var get = function(range,cb) {
 module.exports = {
     get:get
 }
-
-

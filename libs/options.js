@@ -2,7 +2,7 @@ var net = require('net');
 var cidr = require('./cidr');
 var dns = require('dns');
 var async = require('async');
-var findup = require('findup-sync'); 
+var findup = require('findup-sync');
 
 var getTargets = function(target,cb) {
 
@@ -52,7 +52,7 @@ var getTargets = function(target,cb) {
                 return cb("Invalid IPv4 target. ie: 192.168.0.1-5, 192.168.0.1-192.168.0.5");
             }
 
-            for (i = parseInt(splitMinHost[3]); i <= parseInt(maxHost); i++) { 
+            for (i = parseInt(splitMinHost[3]); i <= parseInt(maxHost); i++) {
                 ips.push(splitMinHost[0] + '.' + splitMinHost[1] + '.' +
                          splitMinHost[2] + '.' + i);
             }

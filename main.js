@@ -1,5 +1,5 @@
 var util = require('util');
-var events = require('events').EventEmitter;
+var events = require('events').EventEmitter;
 var tcpconnect = require('./libs/tcpconnect');
 var options = require('./libs/options');
 
