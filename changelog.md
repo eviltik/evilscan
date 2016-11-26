@@ -1,3 +1,6 @@
+v1.0.3 - 2016/11/26
+* fix #43
+
 v1.0.2 - 2016/03/13
 * fix #39 (display ip list when no port specified)
 * merge #38 (async version)
