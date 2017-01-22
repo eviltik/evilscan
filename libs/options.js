@@ -210,22 +210,22 @@ var help = function(optimist,argv) {
 
     if (argv.version||argv.about) {
         var fs = require('fs');
-        var package = JSON.parse(fs.readFileSync(findup('package.json')));
+        var pkg = JSON.parse(fs.readFileSync(findup('pkg.json')));
     }
 
     if (argv.version) {
-        console.log(package.version);
+        console.log(pkg.version);
         process.exit(0);
     }
 
     if (argv.about) {
         console.log(
-            package.name,
-            package.version,'\n',
-            'Resume: '+package.description,'\n',
-            'License: '+package.license,'\n',
-            'Author: '+package.author,'\n',
-            'Repository: '+package.repository.url.replace(/git/,'http')
+            pkg.name,
+            pkg.version,'\n',
+            'Resume: '+pkg.description,'\n',
+            'License: '+pkg.license,'\n',
+            'Author: '+pkg.author,'\n',
+            'Repository: '+pkg.repository.url.replace(/git/,'http')
         );
         process.exit(0);
     }
