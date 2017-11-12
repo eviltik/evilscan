@@ -4,14 +4,10 @@ evilscan
 [![Build Status](https://secure.travis-ci.org/eviltik/evilscan.png)](http://travis-ci.org/eviltik/evilscan)
 [![Dependencies](https://david-dm.org/eviltik/evilscan.svg)](https://david-dm.org/eviltik/evilscan)
 
-Massive ip/port scanner (tcp connect). Work in progress.
+Massive ip/port scanner
 
-Status
--------
-This program is young. I'm not a js expert. Feel free to fork and pull request !
-I'm on #evilprobe (freenode) times to times.
-
-Currently support :
+Features
+--------
 
 * individual IP or IP range scan
 * individual port, ports list, or ports range
@@ -29,19 +25,19 @@ Roadmap
 * more and more tests
 * udp scan
 * syn scan
+* full rewrite (v2) in progress
 
 
 Install
 -------
 
->Travis-ci tests (using mocha+chai), tell us it's ok using **nodejs >= 0.9**. So you can install evilscan using npm, as usual :
 >```
 >npm install -g evilscan
 >```
 
 
-Use evilscan as a node module
------------
+Usage: in your code
+-------------------
 ```
 var evilscan = require('./');
 
@@ -55,25 +51,25 @@ var options = {
 var scanner = new evilscan(options);
 
 scanner.on('result',function(data) {
-        // fired when item is matching options
-            console.log(data);
+    // fired when item is matching options
+    console.log(data);
 });
 
 scanner.on('error',function(err) {
-        throw new Error(data.toString());
+    throw new Error(data.toString());
 });
 
 scanner.on('done',function() {
-        // finished !
+    // finished !
 });
 
 scanner.run();
-
 ```
 
-Use evilscan as a command line tool
------------
+Usage: command line
+-------------------
 Usage: evilscan <fqdn|ipv4|cidr> [options]
+
 Example:
 ```
 root@debian:~# evilscan 192.168.0.0/24 --port=21-23,80
@@ -179,7 +175,7 @@ root@debian:~# evilscan 127.0.0.1 --port=0-65535 --banner --isopen --istimeout -
 
 Tips :
 --------
-**Conncurrency and fast scan**
+**Concurrency and fast scan**
 
 By default, concurrency is 100. Which is slow when you are scanning large ip range or large port range. You can pass a bigger value using --concurrency option. 1000 is fast by example.
 On some linux, only 1024 opened sockets are allowed in the same time. To break this limit, you have to update ulimit parameter of your linux first :
@@ -188,7 +184,7 @@ On some linux, only 1024 opened sockets are allowed in the same time. To break t
 ulimit -u unlimited
 ```
 
-In all cases, due to #25, you will not be able to scan more than 16580355 ip addr at the moment.
+In all cases, due to #25, you will not be able to scan more than 16580355 ipv4 addresses at the moment.
 
 
 **Pause/unpause**

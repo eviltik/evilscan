@@ -1,3 +1,6 @@
+v1.1.0 - 2017/11/12
+* update some package dependencies (warn, see #48)
+
 v1.0.3 - 2016/11/26
 * fix #43
 
