@@ -1,6 +1,6 @@
 {
   "name": "evilscan",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Massive ports scanner for node.",
   "main": "main.js",
   "scripts": {
@@ -28,13 +28,14 @@
     "url": "https://github.com/eviltik/evilscan/issues"
   },
   "dependencies": {
-    "async": "1.0.0",
-    "findup-sync": "0.2.1",
-    "geoip-lite": "1.1.6",
+    "async": "2.6.0",
+    "findup-sync": "2.0.0",
+    "geoip-lite": "1.2.1",
     "optimist": "0.5.0",
-    "printf": "0.2.3",
-    "qjobs": "1.1.4",
-    "winston": "2.2.0"
+    "printf": "0.2.5",
+    "qjobs": "1.1.5",
+    "winston": "2.4.0",
+    "yargs": "^10.0.3"
   },
   "devDependencies": {
     "chai": "latest",
