@@ -2,7 +2,6 @@ evilscan
 ===============
 
 [![Build Status](https://secure.travis-ci.org/eviltik/evilscan.png)](http://travis-ci.org/eviltik/evilscan)
-[![NPM](https://nodei.co/npm-dl/evilscan.png)](https://nodei.co/npm-dl/evilscan/)
 [![Dependencies](https://david-dm.org/eviltik/evilscan.svg)](https://david-dm.org/eviltik/evilscan)
 
 Massive ip/port scanner (tcp connect). Work in progress.
@@ -198,21 +197,4 @@ You can pause/unpause a running scan by sending SIGUSR2 signal. First time it wi
 ```
 kill -SIGUSR2 19859 # where 19859 is the pid of nodejs process running evilscan
 ```
-
-Help needed
-----------
-Do not hesitate to open issues and ask for features. Right now i just need "connect" scan. UDP implementation or syn scans should be great (forks are welcome). More and more tests.
-
-If you are using evilscan, **please star it** !
-
-
-
-Thank you
-----------
-Special thanks to authors of theses nodejs modules :
-* [node-portscanner](https://github.com/baalexander/node-portscanner) for the inspiration
-* [qjobs](https://github.com/franck34/qjobs "qjobs") pause/unpause queue jobs is really cool
-
-and [dailyjs](http://dailyjs.com/) ;)
-
 
