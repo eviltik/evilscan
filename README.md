@@ -8,7 +8,6 @@ Massive ip/port scanner
 
 Features
 --------
-
 * individual IP or IP range scan
 * individual port, ports list, or ports range
 * banner grabbing (not fully implemented, works with verbose ports only)
@@ -21,11 +20,9 @@ Features
 
 Roadmap
 --------
-(see github issues and changelog.md)
-* more and more tests
+* code is old, [full rewrite (v2)](https://github.com/eviltik/evilscan/milestone/3) in progress since nov 2017
 * udp scan
 * syn scan
-* full rewrite (v2) in progress
 
 
 Install
