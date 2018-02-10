@@ -1,31 +1,30 @@
-
-var expect = require('chai').expect;
-var net = require('net')
-var telnet = require('sol-telnet'); // the only one supporting IAC server side
-var path = require('path');
-var evilscan = require('../');
-var port = 1026;
+const expect = require('chai').expect;
+const net = require('net')
+const telnet = require('sol-telnet'); // the only one supporting IAC server side
+const path = require('path');
+const evilscan = require('../');
+const port = 1026;
 
 // Local fake server
-var server = function(options,cb) {
-    var s = net.createServer(function(sock){
-        var ts = new telnet();
+const server = function(options,cb) {
+    let s = net.createServer(function(sock){
+        let ts = new telnet();
         sock.pipe(ts).pipe(sock);
 
-    }).on('connection',function(s) {
-        setTimeout(function() {
+    }).on('connection',(s) => {
+        setTimeout(() => {
             return s.write(options.banner);
         },options.timeout||0);
     }).listen(port,cb)
     return s;
 }
 
-suite(path.basename(__filename), function(a) {
+suite(path.basename(__filename), (a) => {
 
-    var socketTimeout = 100;
-    var testTimeout = 300;
+    let socketTimeout = 100;
+    let testTimeout = 300;
 
-    var opts = {
+    let opts = {
         target:'127.0.0.1',
         port:port,
         timeout:socketTimeout,
@@ -33,24 +32,22 @@ suite(path.basename(__filename), function(a) {
         bannerlen:2
     };
 
-    var commonCheck = function(r) {
+    let commonCheck = (r) => {
         expect(r).to.be.a('object');
         expect(r).to.have.property('status');
     }
 
-    test('connection should be refused 127.0.0.1:'+port,function(next) {
+    test('connection should be refused 127.0.0.1:'+port, function(next) {
 
         this.timeout(testTimeout);
 
         new evilscan(opts)
-            .on('error',function(err) {
-                throw new Error(data.toString());
-            })
-            .on('result',function(r) {
+            .on('error', err => {throw new Error(data.toString())})
+            .on('result', r => {
                 commonCheck(r);
                 expect(r.status).to.be.equal('close (refused)');
             })
-            .on('done',function() {
+            .on('done',() => {
                 next();
             })
             .run();
@@ -58,21 +55,21 @@ suite(path.basename(__filename), function(a) {
     });
 
 
-    test('connection should be ok 127.0.0.1:'+port,function(next) {
+    test('connection should be ok 127.0.0.1:'+port, function(next) {
+
         this.timeout(testTimeout);
+
         var banner = 'hello\r\nworld\r\n';
-        var srv = server({banner:banner},function(err) {
+        var srv = server({banner:banner},err => {
 
             new evilscan(opts)
-                .on('error',function(err) {
-                    throw new Error(data.toString());
-                })
-                .on('result',function(r) {
+                .on('error', err => {throw new Error(data.toString())})
+                .on('result', r => {
                     commonCheck(r);
                     expect(r.status).to.be.equal('open');
                     expect(r.banner).to.be.equal('he');
                 })
-                .on('done',function() {
+                .on('done', () => {
                     srv.close(next);
                 })
                 .run();

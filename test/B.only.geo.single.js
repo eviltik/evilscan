@@ -1,20 +1,20 @@
 
-var expect = require('chai').expect;
-var net = require('net')
-var spawn = require('child_process').spawn;
-var rl = require('readline');
-var evilscan = require('../main.js');
-var path = require('path');
+const expect = require('chai').expect;
+const net = require('net')
+const spawn = require('child_process').spawn;
+const rl = require('readline');
+const evilscan = require('../main.js');
+const path = require('path');
 
-var cleanCmdLineArgs = function(str) {
+function cleanCmdLineArgs(str) {
     str = str.replace(/.\/bin\/evilscan.js /,' ').trim();
     str = str.replace(/\-\-/g,'');
     return '['+str+']';
 }
 
-suite(path.basename(__filename), function() {
+suite(path.basename(__filename), () => {
 
-    var checkResult = function(data,exp) {
+    const checkResult = (data,exp) => {
         if (typeof data !='object') {
             data = data.toString();
             expect(data,'response type should be a string').to.be.a('string');
@@ -26,7 +26,7 @@ suite(path.basename(__filename), function() {
         return true;
     }
 
-    var arr = [{
+    let arr = [{
         title:'should return a real result',
         args:'./bin/evilscan.js 173.194.45.67 --geo --json',
         data: {
@@ -41,24 +41,24 @@ suite(path.basename(__filename), function() {
 
     /* simulate command line */
 
-    arr.forEach(function(item) {
-        test('Binary: ['+item.args+'] '+item.title,function(next) {
+    arr.forEach((item) => {
+        test('Binary: ['+item.args+'] '+item.title, next => {
 
-            var checked = false;
-            var proc = spawn('node',item.args.split(' '));
-            var linereader = rl.createInterface(proc.stdout, proc.stdin);
+            let checked = false;
+            let proc = spawn('node',item.args.split(' '));
+            let linereader = rl.createInterface(proc.stdout, proc.stdin);
 
-            linereader.on('line',function(data) {
+            linereader.on('line', data => {
                 if (item.data) return checked = checkResult(data,item.data);
                 checked = true;
             });
 
-            proc.on('close',function() {
+            proc.on('close', () => {
                 expect(checked,'line received before close proc').to.be.ok;
                 next();
             });
 
-            proc.stderr.on('data',function(data) {
+            proc.stderr.on('data', data => {
                 throw new Error(data.toString());
             });
 
@@ -67,9 +67,9 @@ suite(path.basename(__filename), function() {
 
     /* simulate module usage */
 
-    arr.forEach(function(item) {
-        var o = item.args.split(' ');
-        var argv = {};
+    arr.forEach(item => {
+        let o = item.args.split(' ');
+        let argv = {};
         argv.target = o[1];
         o.forEach(function(arg) {
             if (arg.match(/\-\-/)) {
@@ -78,22 +78,20 @@ suite(path.basename(__filename), function() {
             }
         });
 
-        test('Module: '+cleanCmdLineArgs(item.args)+' '+item.title,function(next) {
+        test('Module: '+cleanCmdLineArgs(item.args)+' '+item.title, function(next) {
 
-            var checked = false;
+            let checked = false;
 
-            var scan = new evilscan(argv,function(s) {
+            new evilscan(argv, s => {
 
-                s.on('result',function(data) {
-                    if (item.data) return checked = checkResult(data,item.data);
+                s.on('result', data => {
+                    if (item.data) return checked = checkResult(data, item.data);
                     checked = true;
                 });
 
-                s.on('error',function(err) {
-                    throw new Error(data.toString());
-                });
+                s.on('error', err => {throw new Error(data.toString())});
 
-                s.on('done',function() {
+                s.on('done',() => {
                     expect(checked,'line received before close proc').to.be.ok;
                     next();
                 });

@@ -1,0 +1,49 @@
+
+Usage: evilscan <fqdn|ipv4|cidr> [options]
+
+Example: evilscan --target=192.168.0.0/24 --port=21-23,80
+
+Options:
+  --port          port(s) you want to scan, examples:
+                  --port=80
+                  --port=21,22
+                  --port=21,22,23,5900-5900
+
+  --reverse       display DNS reverse lookup
+  --reversevalid  only display results having a valid reverse dns, except if
+                  ports specified
+  --geo           display geoip (free maxmind)
+  --banner        display grabbed banner when available
+  --bannerraw     display raw banner (as a JSON Buffer)
+  --bannerlen     grabbed banner length in bytes
+                  default 512
+  --progress      display progress indicator each seconds
+
+  --status        ports status wanted in results (example --status=OT)
+                  T(timeout)
+                  R(refused)
+                  O(open, default)
+                  U(unreachable)
+
+  --scan          scan method
+                  tcpconnect (full connect, default)
+                  tcpsyn (half opened, not yet implemented)
+                  udp (not yet implemented)
+
+  --concurrency   max number of simultaneous socket opened
+                  default 500
+
+  --timeout       maximum number of milliseconds before closing the connection
+                  default 2000
+
+  --hugescan      allow number of ip/port combinaison greater than 16580355
+                  (i.e a /24 network with port range 0-65535)
+  --display       display result format (json,xml,console)
+                  default console
+
+  --json          shortcut for --display=json
+  --xml           shortcut for --display=xml
+  --console       shortcut for --display=console
+  --help          display help
+  --about         display about
+  --version       display version number

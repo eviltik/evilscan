@@ -1,412 +1,402 @@
-var util = require('util');
-var events = require('events').EventEmitter;
-var tcpconnect = require('./libs/tcpconnect');
-var options = require('./libs/options');
+const util = require('util');
+const EventEmitter = require('events').EventEmitter;
+const TcpScan = require('./libs/TcpScan');
+const options = require('./libs/options');
+const dns = require('dns');
+const async = require('async');
+const geoip = require('geoip-lite');
 
-var dns = require('dns');
-var async = require('async');
-var geoip = require('geoip-lite');
+class Evilscan extends EventEmitter {
 
+    constructor(opts, callback) {
+        super();
 
-var evilscan = function(opts,cb) {
-    if (false === (this instanceof evilscan)) {
-        return new evilscan(opts,cb);
+        this.lastMessage = 'Starting';
+        this.paused = false;
+        this.progress = 0;
+        this.progressTimer = null;
+        this.info = {
+            nbIpToScan:0,
+            nbPortToScan:0
+        };
+        this.cacheGeo = {};
+        this.cacheDns = {};
+
+        this.options = opts;
+        this.q = null;
+
+        if (!opts.ips) {
+            // Called from a js script, reparse options
+            options.parse(opts, (err,opts) => {
+                this.options = opts;
+                this._init();
+                callback && callback(this);
+            });
+            return;
+        }
+
+        this._init();
     }
 
-    var self = this;
-
-    this.lastMessage = 'Starting';
-    this.paused = false;
-    this.progress = 0;
-    this.progressTimer = null;
-    this.info = {
-        nbIpToScan:0,
-        nbPortToScan:0
-    };
-    this.cacheGeo = {};
-    this.cacheDns = {};
-
-    this.options = opts;
-
-    if (!opts.ips) {
-        // Called from a js script, reparse options
-        options.parse(opts,function(err,opts) {
-            self.options = opts;
-            self.init();
-            events.call(self);
-            if (cb) cb(self);
+    _init() {
+        this.q = require('qjobs')({
+            maxConcurrency:this.options.concurrency||500
         });
-    } else {
-        this.init();
-        events.call(this);
+
+        this._initTestLocalhost();
+        this._initQueue();
+        this._initQueueProgress();
+        this._initQueuePause();
+        //portscan.setSocketTimeout(argv.timeout||1000);
     }
-};
 
-util.inherits(evilscan, events);
-
-evilscan.prototype.getOptions = function() {
-    return this.options;
-};
-
-evilscan.prototype.initTestLocalhost = function() {
-    if (
-        this.options.ips.length == 1
-        &&
-        this.options.ips[0].match(/^127.0.0.1\//)
-    ) {
-        // For testing purpose, a telnet server can not
+    _initTestLocalhost() {
+        // For tests, the telnet server can not
         // accept more than 50 simultaneous connection,
         // so let's make a pause between each pools
-        this.q.setInterval(1000);
-    }
-};
-
-
-evilscan.prototype.fireProgress = function() {
-    var o = this.q.stats();
-    if (!this.paused) {
-        o._message = this.lastMessage;
-    } else {
-        o._message = 'Paused';
-        o._status = 'Paused';
+        if (
+            this.options.ips.length == 1
+            &&
+            this.options.ips[0].match(/^127.0.0.1\//)
+        ) {
+            this.q.setInterval(1000);
+        }
     }
 
-    this.progress = o._progress;
-    this.emit('progress',o);
-};
+    _initQueue() {
+        // Push scan jobs in the queue
+        let maxi = this.options.ips.length;
+        let maxj = this.options.ports.length;
+        let maxt = maxi*maxj;
+        let i = 0;
+        let j = 0;
+        let ip;
+        let copyOfIps = JSON.parse(JSON.stringify(this.options.ips));
 
-evilscan.prototype.initQueueProgress = function() {
-    if (!this.options.progress) return;
+        this.info.combinaison = maxt;
 
-    var self = this;
-
-    this.progressTimer = setInterval(self.fireProgress.bind(this),1000);
-
-    this.q.on('start',function() {
-        self.emit('start');
-        self.fireProgress();
-    });
-
-    this.q.on('end',function() {
-        clearInterval(self.progressTimer);
-        self.fireProgress();
-        if (self.cb) self.cb();
-    });
-
-};
-
-evilscan.prototype.initQueue = function() {
-
-    var self = this;
-
-    // Push scan jobs in the queue
-    var maxi = this.options.ips.length;
-    var maxj = this.options.ports.length;
-    var maxt = maxi*maxj;
-    this.info.combinaison = maxt;
-    var i = 0;
-
-    var copyOfIps = JSON.parse(JSON.stringify(this.options.ips));
-
-    while (copyOfIps.length) {
-        var ip = copyOfIps.shift();
-        if (this.options.ports.length) {
-            var j = 0;
-            var maxj = this.options.ports.length;
-            for (var j=0;j<maxj;j++) {
-                var args = {
+        while (copyOfIps.length) {
+            ip = copyOfIps.shift();
+            if (this.options.ports.length) {
+                maxj = this.options.ports.length;
+                for (j=0;j<maxj;j++) {
+                    let args = {
+                        ip:ip,
+                        port:this.options.ports[j],
+                        i:i,
+                        max:maxt
+                    }
+                    this.info.nbPortToScan++;
+                    this.q.add(this.scan.bind(this),args);
+                    i++;
+                }
+                this.info.nbIpToScan++;
+            } else {
+                let args = {
                     ip:ip,
-                    port:this.options.ports[j],
                     i:i,
                     max:maxt
                 }
-                this.info.nbPortToScan++;
                 this.q.add(this.scan.bind(this),args);
+                this.info.nbPortToScan = 0;
+                this.info.nbIpToScan = 1;
                 i++;
             }
-            this.info.nbIpToScan++;
-        } else {
-            var args = {
-                ip:ip,
-                i:i,
-                max:maxt
-            }
-            this.q.add(this.scan.bind(this),args);
-            this.info.nbPortToScan = 0;
-            this.info.nbIpToScan = 1;
-            i++;
         }
+
+        this.q.on('end',() => {
+            this.cacheGeo = {};
+            this.cacheDns = {};
+            this.emit('done');
+            this.callbackRun && this.callbackRun();
+        });
+
+        this.q.on('jobStart',(data) => {
+            let str = 'Scanning '+data.ip;
+            if (data.port) str+=':'+data.port;
+            this.lastMessage = str;
+            this.emit('scan',data);
+        });
+
+        this.q.on('jobEnd',(data) => {
+            let str = 'Scanned '+data.ip;
+            if (data.port) str+=':'+data.port;
+            this.lastMessage = str;
+        });
     }
 
-    this.q.on('end',function() {
-        self.cacheGeo = {};
-        self.cacheDns = {};
-        self.emit('done');
-        if (self.cbrun) self.cbrun();
-    });
+    _initQueueProgress() {
+        if (!this.options.progress) {
+            return;
+        }
 
-    this.q.on('jobStart',function(data) {
-        var str = 'Scanning '+data.ip;
-        if (data.port) str+=':'+data.port;
-        self.lastMessage = str;
-        self.emit('scan',data);
-    });
+        this.progressTimer = setInterval(this._triggerQueueProgress.bind(this), 1000);
 
-    this.q.on('jobEnd',function(data) {
-        var str = 'Scanned '+data.ip;
-        if (data.port) str+=':'+data.port;
-        self.lastMessage = str;
-    });
-};
+        this.q.on('start',() => {
+            this.emit('start');
+            this._triggerQueueProgress();
+        });
 
-evilscan.prototype.pause = function() {
-    if (this.paused) return;
-    this.paused = true;
-    this.q.pause(true);
-};
+        this.q.on('end',() => {
+            clearInterval(this.progressTimer);
+            this._triggerQueueProgress();
+            if (this.callback) this.callback();
+        });
+    };
 
-evilscan.prototype.unpause = function() {
-    if (!this.paused) return;
-    this.paused = false;
-    this.q.pause(false);
-};
+    _initQueuePause() {
 
-evilscan.prototype.initQueuePause = function() {
+        if (process.eventNames().indexOf('SIGUSR2') >= 0) {
+            // avoid MaxListenersExceededWarning
+            // see https://github.com/eviltik/evilscan/issues/41#issuecomment-364630079
+            // thanks John cetfor for pointing this ;)
+            return;
+        }
 
-    if (process.eventNames().indexOf('SIGUSR2') >= 0) {
-        // avoid MaxListenersExceededWarning
-        // see https://github.com/eviltik/evilscan/issues/41#issuecomment-364630079
-        // thanks John cetfor for pointing this ;)
+        process.on('SIGUSR2',() => {
+            if (!this.paused) {
+                this.paused = true;
+                this.lastMessage = 'Pause';
+            } else {
+                this.paused = false
+            }
+            this.q.pause(this.paused);
+        });
+    };
+
+    _triggerQueueProgress() {
+        var o = this.q.stats();
+        if (!this.paused) {
+            o._message = this.lastMessage;
+        } else {
+            o._message = 'Paused';
+            o._status = 'Paused';
+        }
+
+        this.progress = o._progress;
+        this.emit('progress',o);
+    };
+
+    _geolocate(ip, callback) {
+
+        if (!this.options.geo) {
+            return callback();
+        }
+
+        if (this.cacheGeo[ip]) {
+            return callback(null, this.cacheGeo[ip]);
+        }
+
+        callback(null, geoip.lookup(ip));
+    }
+
+    _geolocateFormatResult(data, result) {
+        if (!this.options.geo) return result;
+
+        result.city = '';
+        result.country = '';
+        result.region = '';
+        result.latitude = '';
+        result.longitude = '';
+
+        if (!data) return result;
+
+        this.cacheGeo[result.ip] = data;
+
+        result.city = data.city || '';
+        result.country = data.country || '';
+        result.region = data.region || '';
+        result.latitude = data.ll[0] || '';
+        result.longitude = data.ll[1] || '';
+
+        return result;
+    }
+
+    _reverseDns(ip, callback) {
+        if (!this.options.reverse) {
+            return callback();
+        }
+
+        if (this.cacheDns[ip]) {
+            return callback(null, this.cacheDns[ip]);
+        }
+
+        dns.reverse(ip, (err,domains) => {
+            if (err) {
+                if (err.code == 'ENOTFOUND') {
+                    return cb(null);
+                }
+
+                // unknow error
+                this.emit('error',{
+                    fnc:'lookupDns',
+                    err:err
+                });
+                return callback(null);
+            }
+
+            if (!domains.length) {
+                return callback(null);
+            }
+
+            callback(null, domains[0]);
+        });
+    }
+
+    _reverseDnsFormatResult(data, result) {
+        if (!this.options.reverse || !result) return result;
+        result.reverse = '';
+        if (!data) return result;
+        result.reverse = data;
+        this.cacheDns[result.ip] = data;
+        return result;
+    }
+
+    _portScan(ip, port, callback) {
+        if (!port) {
+            return callback();
+        }
+
+        let t = new TcpScan({
+            ip : ip,
+            port : port,
+            banner : this.options.banner,
+            bannerlen : this.options.bannerlen,
+            timeout : this.options.timeout
+        });
+
+        t.analyzePort(callback);
+    };
+
+    _portScanFormatResult(data, result) {
+
+        if (!result || !this.options.port || !data) {
+            return result;
+        }
+
+        if (!this.options.showTimeout && data.status.match(/timeout/i)) {
+            return result = null;
+        }
+
+        if (!this.options.showRefuse && data.status.match(/refuse/i)) {
+            return result = null;
+        }
+
+        if (!this.options.showOpen && data.status.match(/open/i)) {
+            return result = null;
+        }
+
+        if (!this.options.showUnreachable && data.status.match(/unreachable/i)) {
+            return result = null;
+        }
+
+        if (this.options.banner) {
+            result.banner = data.banner || '';
+        }
+
+        if (this.options.bannerraw) {
+            result.bannerraw = data.raw || '';
+        }
+
+        result.status = data.status;
+
+        return result;
+    };
+
+    _formatFinalResult(result) {
+
+        if (!result) {
+            return result;
+        }
+
+        if (this.options.reverse && this.options.reversevalid && result.reverse == '') {
+            result = null;
+        }
+
+        if (!result.port) delete result.port;
+
+        if (this.options.json) {
+
+            if (result.status && result.status.match(/close/i)) {
+                delete result.banner;
+                delete result.bannerraw;
+            }
+
+            if (!result.reverse) {
+                delete result.reverse;
+            }
+
+            if (!result.banner) {
+                delete result.banner;
+            }
+
+            if (!result.bannerraw) {
+                delete result.bannerraw;
+            }
+        }
+        return result;
+    };
+
+    scan(args, nextIteration) {
+
+        let result = {
+            ip:args.ip,
+            port:args.port
+        };
+
+        async.series([
+            (next) => {
+                this._geolocate(args.ip, next);
+            },
+            (next) => {
+                this._reverseDns(args.ip, next);
+            },
+            (next) => {
+                this._portScan(args.ip, args.port, next);
+            }
+        ],(err, arr) => {
+            result = this._geolocateFormatResult(arr[0], result);
+            result = this._reverseDnsFormatResult(arr[1],result);
+            result = this._portScanFormatResult(arr[2],result);
+            result = this._formatFinalResult(result);
+            if (result) {
+                this.emit('result',result);
+            }
+            nextIteration();
+        });
+    }
+
+    run(callback) {
+        this.callbackRun = callback;
+        this.q.run();
         return;
     }
 
-    process.on('SIGUSR2',function() {
-        if (!this.paused) {
-            this.paused = true;
-            this.lastMessage = 'Pause';
-        } else {
-            this.paused = false
-        }
-        this.q.pause(this.paused);
-    }.bind(this));
-    
-};
-
-evilscan.prototype.init = function() {
-
-    this.q = require('qjobs')({
-        maxConcurrency:this.options.concurrency||500
-    });
-
-    this.initTestLocalhost();
-    this.initQueue();
-    this.initQueueProgress();
-    this.initQueuePause();
-    //portscan.setSocketTimeout(argv.timeout||1000);
-};
-
-evilscan.prototype.lookupGeo = function(ip,cb) {
-
-    if (!this.options.geo) {
-        return cb();
+    getOptions() {
+        return this.options;
     }
 
-    if (this.cacheGeo[ip]) {
-        return cb(null,this.cacheGeo[ip]);
+    pause() {
+        if (this.paused) return;
+        this.paused = true;
+        this.q.pause(true);
     }
 
-    var geo = geoip.lookup(ip);
-    cb(null, geo);
-};
-
-evilscan.prototype.lookupDns = function(ip,cb) {
-    var self = this;
-    if (!this.options.reverse) return cb();
-
-    if (this.cacheDns[ip]) {
-        return cb(null,this.cacheDns[ip]);
+    unpause() {
+        if (!this.paused) return;
+        this.paused = false;
+        this.q.pause(false);
     }
 
-    dns.reverse(ip,function(err,domains) {
-        if (err) {
-            if (err.code == 'ENOTFOUND') {
-                return cb(null);
-            } else {
-                // unknow error
-                var e = {
-                    fnc:'lookupDns',
-                    err:err
-                }
-                self.emit('error',e);
-                return cb(null);
-            }
-        }
-        if (!domains.length) return cb(null);
-        cb(null,domains[0]);
-    });
-};
-
-evilscan.prototype.portScan = function(ip,port,cb) {
-    if (!port) return cb();
-    if (port == 0) return cb();
-
-    var args = {
-        ip : ip,
-        port : port,
-        banner : this.options.banner,
-        bannerlen : this.options.bannerlen,
-        timeout : this.options.timeout
-    };
-
-    var t = new tcpconnect(args);
-    t.analyzePort(cb);
-};
-
-evilscan.prototype.resultAddGeo = function(result,r) {
-    if (!this.options.geo) return r;
-
-    r.city = '';
-    r.country = '';
-    r.region = '';
-    r.latitude = '';
-    r.longitude = '';
-
-    if (!result) return r;
-
-    this.cacheGeo[r.ip] = result;
-
-    r.city = result.city || '';
-    r.country = result.country || '';
-    r.region = result.region || '';
-    r.latitude = result.ll[0] || '';
-    r.longitude = result.ll[1] || '';
-
-    return r;
-};
-
-evilscan.prototype.resultAddDns = function(result,r) {
-    if (!this.options.reverse || !r) return r;
-    r.reverse = '';
-    if (!result) return r;
-    r.reverse = result;
-
-    this.cacheDns[r.ip] = result;
-
-    return r;
-};
-
-evilscan.prototype.resultAddPort = function(result,r) {
-
-    if (!r || !this.options.port || !result) {
-        return r;
+    abort() {
+        this.q.abort();
+        return;
     }
 
-    if (!this.options.showTimeout && result.status.match(/timeout/i)) {
-        return r = null;
+    getInfo() {
+        return this.info;
     }
 
-    if (!this.options.showRefuse && result.status.match(/refuse/i)) {
-        return r = null;
-    }
+}
 
-    if (!this.options.showOpen && result.status.match(/open/i)) {
-        return r = null;
-    }
-
-    if (!this.options.showUnreachable && result.status.match(/unreachable/i)) {
-        return r = null;
-    }
-
-    if (this.options.banner) {
-        r.banner = result.banner || '';
-    }
-
-    if (this.options.bannerraw) {
-        r.bannerraw = result.raw || '';
-    }
-
-    r.status = result.status;
-
-    return r;
-};
-
-evilscan.prototype.resultClean = function(r) {
-    if (!r) {
-        return r;
-    }
-
-    if (this.options.reverse && this.options.reversevalid && r.reverse == '') {
-        r = null;
-    }
-
-    if (!r.port) delete r.port;
-
-    if (this.options.json) {
-
-        if (r.status && r.status.match(/close/i)) {
-            delete r.banner;
-            delete r.bannerraw;
-        }
-
-        if (!r.reverse) {
-            delete r.reverse;
-        }
-
-        if (!r.banner) {
-            delete r.banner;
-        }
-
-        if (!r.bannerraw) {
-            delete r.bannerraw;
-        }
-    }
-    return r;
-};
-
-evilscan.prototype.scan = function(args,nextIteration) {
-
-    var self = this;
-
-    var result = {
-        ip:args.ip,
-        port:args.port
-    };
-
-    async.series([
-        function(next) {
-            self.lookupGeo(args.ip,next);
-        },
-        function(next) {
-            self.lookupDns(args.ip,next);
-        },
-        function(next) {
-            self.portScan(args.ip,args.port,next);
-        }
-    ],function(err,arr) {
-        result = self.resultAddGeo(arr[0],result);
-        result = self.resultAddDns(arr[1],result);
-        result = self.resultAddPort(arr[2],result);
-        result = self.resultClean(result);
-        if (result) {
-            self.emit('result',result);
-        }
-        nextIteration();
-    });
-};
-
-evilscan.prototype.run = function(cb) {
-    this.cbrun = cb;
-    this.q.run();
-    return;
-};
-
-evilscan.prototype.abort = function() {
-    this.q.abort();
-    return;
-};
-
-evilscan.prototype.getInfo = function() {
-    return this.info;
-};
-
-module.exports = evilscan;
+module.exports = Evilscan;

@@ -31,11 +31,12 @@
     "async": "2.6.0",
     "findup-sync": "2.0.0",
     "geoip-lite": "1.2.1",
+    "minimist2": "1.0.2",
     "optimist": "0.5.0",
     "printf": "0.2.5",
     "qjobs": "1.1.5",
     "winston": "2.4.0",
-    "yargs": "^10.0.3"
+    "yargs": "11.0.0"
   },
   "devDependencies": {
     "chai": "latest",

@@ -1,20 +1,19 @@
+const expect = require('chai').expect;
+const net = require('net')
+const spawn = require('child_process').spawn;
+const rl = require('readline');
+const evilscan = require('../main.js');
+const path = require('path');
 
-var expect = require('chai').expect;
-var net = require('net')
-var spawn = require('child_process').spawn;
-var rl = require('readline');
-var evilscan = require('../main.js');
-var path = require('path');
-
-var cleanCmdLineArgs = function(str) {
+function cleanCmdLineArgs(str) {
     str = str.replace(/.\/bin\/evilscan.js /,' ').trim();
     str = str.replace(/\-\-/g,'');
     return '['+str+']';
 }
 
-suite(path.basename(__filename), function() {
+suite(path.basename(__filename), () => {
 
-    var checkResult = function(data,exp) {
+    const checkResult = (data, exp) => {
         if (typeof data !='object') {
             data = data.toString();
             expect(data,'response type should be a string').to.be.a('string');
@@ -26,28 +25,28 @@ suite(path.basename(__filename), function() {
         return true;
     }
 
-    var arr = [{
+    let arr = [{
         title:'should be pausable/unpausable',
         args:'./bin/evilscan.js 127.0.0.1/24 --port=0-25 --json --progress --concurrency=10',
     }]
 
     // simulate command line
 
-    arr.forEach(function(item) {
-        test('Binary: ['+item.args+'] '+item.title,function(next) {
+    arr.forEach(item => {
+        test('Binary: ['+item.args+'] '+item.title, function(next) {
 
             this.timeout(10000);
 
-            var checked = false;
-            var proc = spawn('node',item.args.split(' '));
-            var linereaderStdout = rl.createInterface(proc.stdout, proc.stdin);
-            var linereaderStderr = rl.createInterface(proc.stderr, proc.stdin);
+            let checked = false;
+            let proc = spawn('node',item.args.split(' '));
+            let linereaderStdout = rl.createInterface(proc.stdout, proc.stdin);
+            let linereaderStderr = rl.createInterface(proc.stderr, proc.stdin);
 
-            var paused = false;
-            var unpaused = false;
-            var pausedunpaused = false;
+            let paused = false;
+            let unpaused = false;
+            let pausedunpaused = false;
 
-            linereaderStdout.on('line',function(data) {
+            linereaderStdout.on('line', data => {
                 checkResult(data);
                 data = JSON.parse(data);
                 if (data._jobsDone > 100 && !paused && !unpaused) {
@@ -77,14 +76,12 @@ suite(path.basename(__filename), function() {
                 checked = true;
             });
 
-            proc.on('close',function() {
+            proc.on('close',() => {
                 expect(pausedunpaused,'pause/unpause should be true').to.be.ok;
                 next();
             });
 
-            proc.stderr.on('data',function(data) {
-                throw new Error(data.toString());
-            });
+            proc.stderr.on('data',data => {throw new Error(data.toString())});
 
         });
     });
@@ -92,15 +89,15 @@ suite(path.basename(__filename), function() {
 
     // simulate module usage
 
-    arr.forEach(function(item) {
-        var o = item.args.split(' ');
-        var argv = {};
+    arr.forEach(item => {
+        let o = item.args.split(' ');
+        let argv = {};
         argv.target = o[1];
         o.forEach(function(arg) {
             if (arg.match(/\-\-/)) {
                 arg = arg.replace(/\-\-/,'');
                 if (arg.match(/=/)) {
-                    var v = arg.split('=');
+                    let v = arg.split('=');
                     argv[v[0]]=v[1];
                 } else {
                     argv[arg] = true;
@@ -114,20 +111,18 @@ suite(path.basename(__filename), function() {
 
             this.timeout(10000);
 
-            var checked = false;
-            var paused = false;
-            var unpaused = false;
-            var pausedunpaused = false;
+            let checked = false;
+            let paused = false;
+            let unpaused = false;
+            let pausedunpaused = false;
 
             new evilscan(argv)
-                .on('error',function(err) {
-                    throw new Error(data.toString());
-                })
-                .on('done',function() {
+                .on('error',err => {throw new Error(data.toString())})
+                .on('done',() => {
                     expect(pausedunpaused,'pause/unpause should be true').to.be.ok;
                     next();
                 })
-                .on('progress',function(data) {
+                .on('progress', data => {
                     if (data._jobsDone > 100 && !paused && !unpaused) {
                         // let's send pause signal
                         this.pause();

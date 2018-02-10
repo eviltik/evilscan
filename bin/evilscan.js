@@ -1,16 +1,17 @@
 #!/usr/bin/env node
-var evilscan = require('../main');
-var options = require('../libs/options');
-var output = require('../libs/formater');
-var printf = require('printf');
+const evilscan = require('../main');
+const options = require('../libs/options');
+const output = require('../libs/formater');
+const printf = require('printf');
+const argv = require('minimist2')(process.argv.slice(2));
 
-options.parse(process.argv,function(err,options) {
+options.parse(argv, (err, options) => {
     if (err) {
         console.log('Error: ',err);
         process.exit(0);
     }
 
-    var scan = new evilscan(options);
+    let scan = new evilscan(options);
 
     //console.log(scan.getInfo());
 
