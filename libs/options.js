@@ -210,22 +210,22 @@ function help(args) {
         process.exit(0);
     }
 
-    let package = {};
+    let packageInfo = {};
 
     if (args.version||args.about) {
-        package = JSON.parse(fs.readFileSync(findup('package.json')));
+        packageInfo = JSON.parse(fs.readFileSync(findup('package.json')));
     }
 
     if (args.version) {
-        console.log(package.version);
+        console.log(packageInfo.version);
         process.exit(0);
     }
 
     if (args.about) {
-        console.log('%s v%s', package.name, package.version, package.description);
-        console.log('License: %s', package.license);
-        console.log('Author: %s', package.author);
-        console.log('Repository: %s',package.repository.url.replace(/git/,'http'));
+        console.log('%s v%s', packageInfo.name, packageInfo.version, packageInfo.description);
+        console.log('License: %s', packageInfo.license);
+        console.log('Author: %s', packageInfo.author);
+        console.log('Repository: %s',packageInfo.repository.url.replace(/git/,'http'));
         process.exit(0);
     }
 };
