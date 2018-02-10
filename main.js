@@ -172,6 +172,14 @@ evilscan.prototype.unpause = function() {
 };
 
 evilscan.prototype.initQueuePause = function() {
+
+    if (process.eventNames().indexOf('SIGUSR2') >= 0) {
+        // avoid MaxListenersExceededWarning
+        // see https://github.com/eviltik/evilscan/issues/41#issuecomment-364630079
+        // thanks John cetfor for pointing this ;)
+        return;
+    }
+
     process.on('SIGUSR2',function() {
         if (!this.paused) {
             this.paused = true;
@@ -181,6 +189,7 @@ evilscan.prototype.initQueuePause = function() {
         }
         this.q.pause(this.paused);
     }.bind(this));
+    
 };
 
 evilscan.prototype.init = function() {
