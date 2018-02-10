@@ -1,4 +1,4 @@
-var argv = require('optimist').argv;
+const argv = require('minimist2')(process.argv.slice(2));
 
 var outputJson = function(o) {
     console.log(JSON.stringify(o));
