@@ -1,7 +1,6 @@
-// var evilscan = require('evilscan');
-var evilscan = require('../');
+const evilscan = require('../');
 
-var options = {
+let options = {
     target :'173.194.45.67',
     // target  :'192.168.1.1-5',
     // target  :'192.168.1.1-192.168.1.5',
@@ -12,7 +11,7 @@ var options = {
     //geo	    : true
 };
 
-var scanner = new evilscan(options);
+let scanner = new evilscan(options);
 
 scanner.on('result',function (data) {
 	// fired when item is matching options
