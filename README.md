@@ -34,7 +34,7 @@ Install
 Usage: in your code
 -------------------
 ```
-var evilscan = require('./');
+var evilscan = require('evilscan');
 
 var options = {
     target:'127.0.0.1',
