@@ -81,7 +81,7 @@ suite(path.basename(__filename), () => {
             this.timeout(5000);
             let checked = false;
 
-            new evilscan(argv, s => {
+            new evilscan(argv, (err, s) => {
 
                 //console.log('ici',s.options);
 

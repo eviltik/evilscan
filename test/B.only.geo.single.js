@@ -82,7 +82,7 @@ suite(path.basename(__filename), () => {
 
             let checked = false;
 
-            new evilscan(argv, s => {
+            new evilscan(argv, (err, s) => {
 
                 s.on('result', data => {
                     if (item.data) return checked = checkResult(data, item.data);

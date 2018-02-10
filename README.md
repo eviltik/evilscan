@@ -31,7 +31,7 @@ Install
 >```
 
 
-Usage: in your code
+Usage: in your code, using events only
 -------------------
 ```
 var evilscan = require('evilscan');
@@ -59,6 +59,44 @@ scanner.on('done',function() {
 });
 
 scanner.run();
+```
+
+
+Usage: in your code, using callback and events
+-------------------
+```
+var evilscan = require('evilscan');
+
+var options = {
+    target:'127.0.0.1',
+    port:'21-23',
+    status:'TROU', // Timeout, Refused, Open, Unreachable
+    banner:true
+};
+
+new evilscan(options, (err, scan) {
+
+    if (err) {
+        console.log(err);
+        return;
+    }
+    
+    scan.on('result',function(data) {
+        // fired when item is matching options
+        console.log(data);
+    });
+
+    scan.on('error',function(err) {
+        throw new Error(data.toString());
+    });
+
+    scan.on('done',function() {
+        // finished !
+    });
+
+    scan.run();
+});
+
 ```
 
 Usage: command line

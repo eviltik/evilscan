@@ -48,7 +48,7 @@ suite(path.basename(__filename), () => {
     }
 
     test(props.title, (next) => {
-        let scan = new evilscan(props.args, (s) => {
+        let scan = new evilscan(props.args, (err, s) => {
             expect(s.options).to.be.deep.equal(props.result);
             next();
         });
