@@ -1,10 +1,10 @@
 const argv = require('minimist2')(process.argv.slice(2));
 
-var outputJson = function(o) {
+function outputJson(o) {
     console.log(JSON.stringify(o));
 }
 
-var outputRaw = function(o) {
+function outputRaw(o) {
     if (o.error) {
         return console.log('Error: ',o.error)
     }
@@ -14,7 +14,7 @@ var outputRaw = function(o) {
     console.log(str);
 }
 
-var output = function(o,argv) {
+function output(o,argv) {
     if (argv.json) {
         return outputJson(o);
     }
