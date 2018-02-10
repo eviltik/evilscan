@@ -6,23 +6,17 @@ evilscan
 
 Massive ip/port scanner
 
+
 Features
 --------
 * individual IP or IP range scan
 * individual port, ports list, or ports range
-* banner grabbing (not fully implemented, works with verbose ports only)
-* IAC negotiation
+* banner grabbing (not fully implemented, works with native verbose ports only)
+* IAC negotiation for telnet
 * reverse dns
 * geolocation information
-* shell or json output
-* optional progress details
-
-
-Roadmap
---------
-* code is old, [full rewrite (v2)](https://github.com/eviltik/evilscan/milestone/3) in progress since nov 2017
-* udp scan
-* syn scan
+* stdout or json output
+* optional progress details (event based)
 
 
 Install
@@ -80,60 +74,60 @@ Options
                   --port=80
                   --port=21,22
                   --port=21,22,23,5900-5902
-                                                                                
-  --reverse       display DNS reverse lookup                                    
-  
+
+  --reverse       display DNS reverse lookup
+
   --reversevalid  only display results having a valid reverse dns, except if
-                  ports specified                                               
-  
-  --geo           display geoip (free maxmind)                                  
-  
-  --banner        display banner                                                
- 
+                  ports specified
+
+  --geo           display geoip (free maxmind)
+
+  --banner        display banner
+
   --bannerlen     set banner length grabing
                   default 512
 
-  --bannerraw     display raw banner (as a JSON Buffer)                         
-  
+  --bannerraw     display raw banner (as a JSON Buffer)
+
   --progress      display progress indicator each seconds
-                                                                                
+
   --status        ports status wanted in results (example --status=OT)
                   T(timeout)
                   R(refused)
                   O(open, default)
                   U(unreachable)
-                                                                                
+
   --scan          scan method
                   tcpconnect (full connect, default)
                   tcpsyn (half opened, not yet implemented)
                   udp (not yet implemented)
-                                                                                
+
   --concurrency   max number of simultaneous socket opened
                   default 500
-                                                                                
+
   --timeout       maximum number of milliseconds before closing the connection
                   default 2000
-                                                                                
+
   --display       display result format (json,xml,console)
                   default console
-                                                                                
-  --json          shortcut for --display=json                                   
-  
-  --xml           shortcut for --display=xml                                    
-  
-  --console       shortcut for --display=console                                
-  
-  --help          display help                                                  
-  
-  --about         display about                                                 
-  
-  --version       display version number                                        
+
+  --json          shortcut for --display=json
+
+  --xml           shortcut for --display=xml
+
+  --console       shortcut for --display=console
+
+  --help          display help
+
+  --about         display about
+
+  --version       display version number
 ```
 
 Samples output
 ----------------
 
-* Every ports on localhost, grab banner, display only opened ports 
+* Every ports on localhost, grab banner, display only opened ports
 ```
 root@debian:~# evilscan 127.0.0.1 --port=0-65535 --banner
 127.0.0.1|111||open
@@ -190,4 +184,3 @@ You can pause/unpause a running scan by sending SIGUSR2 signal. First time it wi
 ```
 kill -SIGUSR2 19859 # where 19859 is the pid of nodejs process running evilscan
 ```
-
