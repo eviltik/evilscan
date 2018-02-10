@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const evilscan = require('../main');
+const evilscan = require('../');
 const options = require('../libs/options');
 const output = require('../libs/formater');
 const printf = require('printf');

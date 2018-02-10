@@ -2,7 +2,7 @@ const expect = require('chai').expect;
 const net = require('net')
 const spawn = require('child_process').spawn;
 const rl = require('readline');
-const evilscan = require('../main.js');
+const evilscan = require('../');
 const path = require('path');
 
 function cleanCmdLineArgs(str) {

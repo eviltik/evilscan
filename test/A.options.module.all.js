@@ -1,6 +1,6 @@
 const expect = require('chai').expect;
 const path = require('path');
-const evilscan = require('../main');
+const evilscan = require('../');
 
 suite(path.basename(__filename), () => {
 
