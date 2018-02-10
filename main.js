@@ -174,7 +174,7 @@ class Evilscan extends EventEmitter {
         }
 
         this.progress = o._progress;
-        this.emit('progress',o);
+        this.emit('progress', o, this);
     };
 
     _geolocate(ip, callback) {

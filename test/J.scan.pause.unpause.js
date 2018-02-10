@@ -122,21 +122,21 @@ suite(path.basename(__filename), () => {
                     expect(pausedunpaused,'pause/unpause should be true').to.be.ok;
                     next();
                 })
-                .on('progress', data => {
+                .on('progress', (data, scan) => {
                     if (data._jobsDone > 100 && !paused && !unpaused) {
                         // let's send pause signal
-                        this.pause();
+                        scan.pause();
                         paused = true;
                     } else if (paused && !unpaused) {
                         if (data._status && data._status.match(/paused/i)) {
                             // let's send unpause signal
                             unpaused = true;
-                            this.unpause();
+                            scan.unpause();
                         }
                     } else if (unpaused) {
                         if (data._status && data._status.match(/running/i)) {
                             pausedunpaused = true;
-                            this.abort();
+                            scan.abort();
                         }
                     }
                 })
