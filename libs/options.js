@@ -254,19 +254,18 @@ function parse(args, callback) {
         (next) => {
             getPorts(args.port, next);
         }
-    ],(err, result) => {
+    ], (err, result) => {
 
-        if (err) return callback(err);
+        if (err) return callback(err, args);
 
         args.ips = result[0];
         args.ports = result[1];
 
         if (!args.port && !args.reverse && !args.geo) {
-            return callback('Please specify at least one port, --port=80');
+            return callback('Please specify at least one port, --port=80', args);
         }
 
         takeCareOfCrazyPeople(args, callback);
-
         callback(null, args);
     });
 };

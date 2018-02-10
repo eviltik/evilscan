@@ -22,15 +22,29 @@ class Evilscan extends EventEmitter {
         this.cacheGeo = {};
         this.cacheDns = {};
 
-        this.options = opts;
+        this.options = opts || {};
         this.q = null;
 
         if (!opts.ips) {
             // Called from a js script, reparse options
-            options.parse(opts, (err,opts) => {
+            options.parse(opts, (err, opts) => {
+
+                if (err) {
+                    // @TODO: is there a way to know if error handler has been
+                    // defined rather than this shit of try catch ?
+                    try {
+                        return this.emit('error', err);
+                    } catch(e) {
+                    }
+                }
+
+                if (err && callback) {
+                    return callback(err, this);
+                }
+
                 this.options = opts;
                 this._init();
-                callback && callback(this);
+                callback && callback(null, this);
             });
             return;
         }
@@ -39,6 +53,8 @@ class Evilscan extends EventEmitter {
     }
 
     _init() {
+
+        //if (this.options && this.options.concurrency) {
         this.q = require('qjobs')({
             maxConcurrency:this.options.concurrency||500
         });
@@ -54,6 +70,9 @@ class Evilscan extends EventEmitter {
         // For tests, the telnet server can not
         // accept more than 50 simultaneous connection,
         // so let's make a pause between each pools
+
+        if (!this.options || !this.options.ips || !this.options.ips.length) return;
+
         if (
             this.options.ips.length == 1
             &&
@@ -65,6 +84,9 @@ class Evilscan extends EventEmitter {
 
     _initQueue() {
         // Push scan jobs in the queue
+
+        if (!this.options || !this.options.ips || !this.options.ips.length) return;
+
         let maxi = this.options.ips.length;
         let maxj = this.options.ports.length;
         let maxt = maxi*maxj;
@@ -368,7 +390,7 @@ class Evilscan extends EventEmitter {
 
     run(callback) {
         this.callbackRun = callback;
-        this.q.run();
+        this.q && this.q.run();
         return;
     }
 
