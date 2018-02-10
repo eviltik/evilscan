@@ -1,4 +1,4 @@
-var IAC={
+const IAC = {
     ECHO:1,
     SUPPRESS_GO_AHEAD:3,
     STATUS:5,
@@ -26,11 +26,11 @@ var IAC={
     IAC:0xFF
 }
 
-var negotiate = function(buf,socket) {
-    var nbIAC = 0;
-    var count = 0;
-    var str = '';
-    for (var i = 0; i<buf.length;i++) {
+function negotiate(buf, socket) {
+    let nbIAC = 0;
+    let count = 0;
+    let str = '';
+    for (let i = 0; i<buf.length;i++) {
         if (buf[i] == IAC.IAC) {
             count = 1;
             nbIAC++;
@@ -57,7 +57,7 @@ var negotiate = function(buf,socket) {
                 case IAC.ENV_VARS:              str+='ENV_VARS';            break;
                 default:                        str+='UNKNOW';              break;
             }
-            var nbuf = new Buffer([IAC.IAC,IAC.WONT,buf[i]]);
+            let nbuf = new Buffer([IAC.IAC,IAC.WONT,buf[i]]);
             socket.write(nbuf);
             buf.slice(count*nbIAC);
         }
