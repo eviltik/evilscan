@@ -246,7 +246,7 @@ class Evilscan extends EventEmitter {
         dns.reverse(ip, (err,domains) => {
             if (err) {
                 if (err.code == 'ENOTFOUND') {
-                    return cb(null);
+                    return callback(null);
                 }
 
                 // unknow error
