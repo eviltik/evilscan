@@ -4,7 +4,8 @@ const TcpScan = require('./libs/TcpScan');
 const options = require('./libs/options');
 const dns = require('dns');
 const async = require('async');
-const geoip = require('geoip-lite');
+
+var geoip;
 
 class Evilscan extends EventEmitter {
 
@@ -205,6 +206,10 @@ class Evilscan extends EventEmitter {
             return callback();
         }
 
+        if (!geoip) {
+          geoip = require('geoip-lite');
+        }
+        
         if (this.cacheGeo[ip]) {
             return callback(null, this.cacheGeo[ip]);
         }
