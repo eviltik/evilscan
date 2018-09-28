@@ -1,3 +1,9 @@
+v1.7.1 - 2018/09/29
+* don't require geoip-lite if geo option not specified (default) fix #54
+
+v1.1.0 => v1.7.0
+* i was probably drunked, i don't remember
+
 v1.1.0 - 2017/11/12
 * update some package dependencies (warn, see #48)
 
@@ -42,4 +48,4 @@ v0.0.5 - 2013/06/14
 v0.0.4 - 2013/06/11
 ===================
 * First npm module
-* Really bad code 
+* Really bad code
