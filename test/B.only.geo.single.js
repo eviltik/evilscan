@@ -22,6 +22,8 @@ suite(path.basename(__filename), () => {
             data = JSON.parse(data);
         }
         expect(data,'JSON.parse should return an object').to.be.a('object');
+        console.log('received', data);
+        console.log('expected', data);
         expect(data,'object should match').to.be.deep.equal(exp);
         return true;
     }
