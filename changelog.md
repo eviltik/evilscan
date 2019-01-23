@@ -1,3 +1,11 @@
+v1.7.3 - 2019/01/23
+* maintenance: update npm packages
+* fix geoip test
+* ci tests should accept nodejs v10 and v11
+
+v1.7.2 - 2019/01/23 (broken tests, see 1.7.3)
+* don't destroy a non existing socket, fix #58
+
 v1.7.1 - 2018/09/29
 * don't require geoip-lite if geo option not specified (default) fix #54
 
