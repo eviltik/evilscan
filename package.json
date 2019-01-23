@@ -1,6 +1,6 @@
 {
   "name": "evilscan",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "description": "Massive ports scanner for node.",
   "main": "index.js",
   "scripts": {
