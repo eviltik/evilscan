@@ -1,6 +1,6 @@
 {
   "name": "evilscan",
-  "version": "1.7.4",
+  "version": "1.7.5",
   "description": "Massive ports scanner for node.",
   "main": "index.js",
   "scripts": {
@@ -21,7 +21,7 @@
     "evilprobe"
   ],
   "author": "eviltik",
-  "license": "GPL-3.0",
+  "license": "MIT",
   "readmeFilename": "README.md",
   "gitHead": "04dc1848981c48dfe5e36af1afaab2d29cdcde12",
   "bugs": {

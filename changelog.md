@@ -1,3 +1,6 @@
+v1.7.5 - 2019/01/23
+* switch to MIT licence
+
 v1.7.4 - 2019/01/23
 * fix #57
 
