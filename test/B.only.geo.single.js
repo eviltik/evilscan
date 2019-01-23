@@ -33,7 +33,7 @@ suite(path.basename(__filename), () => {
             ip: '173.194.45.67',
             city: 'Mountain View',
             country: 'US',
-            region: 'CA',
+            region: 'NA',
             latitude: 37.4192,
             longitude: -122.0574
         }
