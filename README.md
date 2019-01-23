@@ -8,7 +8,7 @@ evilscan
 [![Licence](https://badges.frapsoft.com/os/gpl/gpl.svg?v=102)](https://github.com/ellerbrock/open-source-badge/)
 [![Dependency Status](https://david-dm.org/eviltik/evilscan.svg)](https://david-dm.org/eviltik/evilscan)
 
-Massive ip/port scanner
+Nodejs Simple Network Scanner
 
 
 Features
@@ -80,7 +80,7 @@ new evilscan(options, (err, scan) {
         console.log(err);
         return;
     }
-    
+
     scan.on('result',function(data) {
         // fired when item is matching options
         console.log(data);
