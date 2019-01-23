@@ -84,8 +84,10 @@ class TcpScan {
         }
 
         this.log(JSON.stringify(this.result));
-        this.socket.destroy();
-        delete this.socket;
+        if (this.socket) {
+            this.socket.destroy();
+            delete this.socket;
+        }
         this.cb(null, this.result);
     }
 
@@ -118,7 +120,7 @@ class TcpScan {
         } else {
             this.result.status = 'open';
         }
-        this.socket.destroy();;
+        this.socket && this.socket.destroy();;
     }
 
     _onData(buf) {
@@ -129,7 +131,7 @@ class TcpScan {
             if (d) this.log(d.replace(/[\n\r]/,' '));
             return this.result.banner += d;
         }
-        this.socket.destroy();
+        this.socket && this.socket.destroy();
     }
 
 
