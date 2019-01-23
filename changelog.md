@@ -1,3 +1,6 @@
+v1.7.4 - 2019/01/23
+* fix #57
+
 v1.7.3 - 2019/01/23
 * maintenance: update npm packages
 * fix geoip test
