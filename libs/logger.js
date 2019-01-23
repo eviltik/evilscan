@@ -21,12 +21,10 @@ const logger = new (winston.Logger)({
 	]
 });
 
-let i = 0;
 let debug = false;
 
 process.argv.forEach(arg => {
     if (arg=='-d') debug = true;
-    i++;
 });
 
 if (!debug) {
