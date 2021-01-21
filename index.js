@@ -1,4 +1,3 @@
-const util = require('util');
 const EventEmitter = require('events').EventEmitter;
 const TcpScan = require('./libs/TcpScan');
 const options = require('./libs/options');
@@ -36,6 +35,7 @@ class Evilscan extends EventEmitter {
                     try {
                         return this.emit('error', err);
                     } catch(e) {
+                        //
                     }
                 }
 
@@ -72,7 +72,9 @@ class Evilscan extends EventEmitter {
         // accept more than 50 simultaneous connection,
         // so let's make a pause between each pools
 
-        if (!this.options || !this.options.ips || !this.options.ips.length) return;
+        if (!this.options || !this.options.ips || !this.options.ips.length) {
+            return;
+        }
 
         if (
             this.options.ips.length == 1
@@ -86,15 +88,17 @@ class Evilscan extends EventEmitter {
     _initQueue() {
         // Push scan jobs in the queue
 
-        if (!this.options || !this.options.ips || !this.options.ips.length) return;
+        if (!this.options || !this.options.ips || !this.options.ips.length) {
+            return;
+        }
 
-        let maxi = this.options.ips.length;
+        const maxi = this.options.ips.length;
         let maxj = this.options.ports.length;
-        let maxt = maxi*maxj;
+        const maxt = maxi*maxj;
         let i = 0;
         let j = 0;
         let ip;
-        let copyOfIps = JSON.parse(JSON.stringify(this.options.ips));
+        const copyOfIps = JSON.parse(JSON.stringify(this.options.ips));
 
         this.info.combinaison = maxt;
 
@@ -103,45 +107,45 @@ class Evilscan extends EventEmitter {
             if (this.options.ports.length) {
                 maxj = this.options.ports.length;
                 for (j=0;j<maxj;j++) {
-                    let args = {
-                        ip:ip,
+                    const args = {
+                        ip,
                         port:this.options.ports[j],
-                        i:i,
+                        i,
                         max:maxt
-                    }
+                    };
                     this.info.nbPortToScan++;
-                    this.q.add(this.scan.bind(this),args);
+                    this.q.add(this.scan.bind(this), args);
                     i++;
                 }
                 this.info.nbIpToScan++;
             } else {
-                let args = {
-                    ip:ip,
-                    i:i,
+                const args = {
+                    ip,
+                    i,
                     max:maxt
-                }
-                this.q.add(this.scan.bind(this),args);
+                };
+                this.q.add(this.scan.bind(this), args);
                 this.info.nbPortToScan = 0;
                 this.info.nbIpToScan = 1;
                 i++;
             }
         }
 
-        this.q.on('end',() => {
+        this.q.on('end', () => {
             this.cacheGeo = {};
             this.cacheDns = {};
             this.emit('done');
             this.callbackRun && this.callbackRun();
         });
 
-        this.q.on('jobStart',(data) => {
+        this.q.on('jobStart', data => {
             let str = 'Scanning '+data.ip;
             if (data.port) str+=':'+data.port;
             this.lastMessage = str;
-            this.emit('scan',data);
+            this.emit('scan', data);
         });
 
-        this.q.on('jobEnd',(data) => {
+        this.q.on('jobEnd', data => {
             let str = 'Scanned '+data.ip;
             if (data.port) str+=':'+data.port;
             this.lastMessage = str;
@@ -155,17 +159,17 @@ class Evilscan extends EventEmitter {
 
         this.progressTimer = setInterval(this._triggerQueueProgress.bind(this), 1000);
 
-        this.q.on('start',() => {
+        this.q.on('start', () => {
             this.emit('start');
             this._triggerQueueProgress();
         });
 
-        this.q.on('end',() => {
+        this.q.on('end', () => {
             clearInterval(this.progressTimer);
             this._triggerQueueProgress();
-            if (this.callback) this.callback();
+            this.callback && this.callback();
         });
-    };
+    }
 
     _initQueuePause() {
 
@@ -176,16 +180,16 @@ class Evilscan extends EventEmitter {
             return;
         }
 
-        process.on('SIGUSR2',() => {
+        process.on('SIGUSR2', () => {
             if (!this.paused) {
                 this.paused = true;
                 this.lastMessage = 'Pause';
             } else {
-                this.paused = false
+                this.paused = false;
             }
             this.q.pause(this.paused);
         });
-    };
+    }
 
     _triggerQueueProgress() {
         var o = this.q.stats();
@@ -198,7 +202,7 @@ class Evilscan extends EventEmitter {
 
         this.progress = o._progress;
         this.emit('progress', o, this);
-    };
+    }
 
     _geolocate(ip, callback) {
 
@@ -207,9 +211,9 @@ class Evilscan extends EventEmitter {
         }
 
         if (!geoip) {
-          geoip = require('geoip-lite');
+            geoip = require('geoip-lite');
         }
-        
+
         if (this.cacheGeo[ip]) {
             return callback(null, this.cacheGeo[ip]);
         }
@@ -218,7 +222,9 @@ class Evilscan extends EventEmitter {
     }
 
     _geolocateFormatResult(data, result) {
-        if (!this.options.geo) return result;
+        if (!this.options.geo) {
+            return result;
+        }
 
         result.city = '';
         result.country = '';
@@ -226,7 +232,9 @@ class Evilscan extends EventEmitter {
         result.latitude = '';
         result.longitude = '';
 
-        if (!data) return result;
+        if (!data) {
+            return result;
+        }
 
         this.cacheGeo[result.ip] = data;
 
@@ -241,29 +249,34 @@ class Evilscan extends EventEmitter {
 
     _reverseDns(ip, callback) {
         if (!this.options.reverse) {
-            return callback();
+            callback();
+            return;
         }
 
         if (this.cacheDns[ip]) {
-            return callback(null, this.cacheDns[ip]);
+            callback(null, this.cacheDns[ip]);
+            return;
         }
 
-        dns.reverse(ip, (err,domains) => {
+        dns.reverse(ip, (err, domains) => {
             if (err) {
                 if (err.code == 'ENOTFOUND') {
-                    return callback(null);
+                    callback(null);
+                    return;
                 }
 
                 // unknow error
-                this.emit('error',{
+                this.emit('error', {
                     fnc:'lookupDns',
-                    err:err
+                    err
                 });
-                return callback(null);
+                callback(null);
+                return;
             }
 
             if (!domains.length) {
-                return callback(null);
+                callback(null);
+                return;
             }
 
             callback(null, domains[0]);
@@ -284,16 +297,16 @@ class Evilscan extends EventEmitter {
             return callback();
         }
 
-        let t = new TcpScan({
-            ip : ip,
-            port : port,
+        const t = new TcpScan({
+            ip,
+            port,
             banner : this.options.banner,
             bannerlen : this.options.bannerlen,
             timeout : this.options.timeout
         });
 
         t.analyzePort(callback);
-    };
+    }
 
     _portScanFormatResult(data, result) {
 
@@ -328,7 +341,7 @@ class Evilscan extends EventEmitter {
         result.status = data.status;
 
         return result;
-    };
+    }
 
     _formatFinalResult(result) {
 
@@ -362,7 +375,7 @@ class Evilscan extends EventEmitter {
             }
         }
         return result;
-    };
+    }
 
     scan(args, nextIteration) {
 
@@ -381,13 +394,13 @@ class Evilscan extends EventEmitter {
             (next) => {
                 this._portScan(args.ip, args.port, next);
             }
-        ],(err, arr) => {
+        ], (err, arr) => {
             result = this._geolocateFormatResult(arr[0], result);
-            result = this._reverseDnsFormatResult(arr[1],result);
-            result = this._portScanFormatResult(arr[2],result);
+            result = this._reverseDnsFormatResult(arr[1], result);
+            result = this._portScanFormatResult(arr[2], result);
             result = this._formatFinalResult(result);
             if (result) {
-                this.emit('result',result);
+                this.emit('result', result);
             }
             nextIteration();
         });

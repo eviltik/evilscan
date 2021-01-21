@@ -1,4 +1,3 @@
-const argv = require('minimist2')(process.argv.slice(2));
 const fs = require('fs');
 
 function outputJson(o, outputFile) {
@@ -21,7 +20,7 @@ function outputRaw(o, outputFile) {
     }
     var str = '';
     for (var key in o) str+=o[key]+'|';
-    str = str.replace(/\| ?$/,'');
+    str = str.replace(/\| ?$/, '');
     if (outputFile) {
         return str;
     } else {
@@ -45,7 +44,7 @@ function output(o, argv) {
         outputJson(o);
         return;
     }
-    
+
     outputRaw(o);
 }
 

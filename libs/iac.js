@@ -24,41 +24,44 @@ const IAC = {
     DO:0xFD,
     DONT:0xFE,
     IAC:0xFF
-}
+};
 
 function negotiate(buf, socket) {
     let nbIAC = 0;
     let count = 0;
-    let str = '';
+    //let str = '';
     for (let i = 0; i<buf.length;i++) {
         if (buf[i] == IAC.IAC) {
             count = 1;
             nbIAC++;
-            str='IAC ';
+            //str='IAC ';
         } else if (count==1) {
+            /*
             switch (buf[i]) {
-                case IAC.DO:    str+='DO ';     break;
-                case IAC.DONT:  str+='DONT ';   break;
-                case IAC.WILL:  str+='WILL ';   break;
-                case IAC.WONT:  str+='WONT ';   break;
+            case IAC.DO:    str+='DO ';     break;
+            case IAC.DONT:  str+='DONT ';   break;
+            case IAC.WILL:  str+='WILL ';   break;
+            case IAC.WONT:  str+='WONT ';   break;
             }
+            */
             count++;
         } else if (count==2) {
+            /*
             switch (buf[i]) {
-                case IAC.ECHO:                  str+='ECHO';                break;
-                case IAC.SUPPRESS_GO_AHEAD:     str+='SUPPRESS_GO_AHEAD';   break;
-                case IAC.STATUS:                str+='STATUS';              break;
-                case IAC.TIMING_MARK:           str+='TIMING_MARK';         break;
-                case IAC.TERMINAL_TYPE:         str+='TERMINAL_TYPE';       break;
-                case IAC.WINDOW_SIZE:           str+='WINDOW_SIZE';         break;
-                case IAC.TERMINAL_SPEED:        str+='TERMINAL_SPEED';      break;
-                case IAC.REMOTE_FLOW_CONTROL:   str+='REMOTE_FLOW_CONTROL'; break;
-                case IAC.LINEMODE:              str+='LINEMODE';            break;
-                case IAC.ENV_VARS:              str+='ENV_VARS';            break;
-                default:                        str+='UNKNOW';              break;
+            case IAC.ECHO:                  str+='ECHO';                break;
+            case IAC.SUPPRESS_GO_AHEAD:     str+='SUPPRESS_GO_AHEAD';   break;
+            case IAC.STATUS:                str+='STATUS';              break;
+            case IAC.TIMING_MARK:           str+='TIMING_MARK';         break;
+            case IAC.TERMINAL_TYPE:         str+='TERMINAL_TYPE';       break;
+            case IAC.WINDOW_SIZE:           str+='WINDOW_SIZE';         break;
+            case IAC.TERMINAL_SPEED:        str+='TERMINAL_SPEED';      break;
+            case IAC.REMOTE_FLOW_CONTROL:   str+='REMOTE_FLOW_CONTROL'; break;
+            case IAC.LINEMODE:              str+='LINEMODE';            break;
+            case IAC.ENV_VARS:              str+='ENV_VARS';            break;
+            default:                        str+='UNKNOW';              break;
             }
-
-            let nbuf = new Buffer.from([IAC.IAC,IAC.WONT,buf[i]]);
+            */
+            const nbuf = new Buffer.from([IAC.IAC, IAC.WONT, buf[i]]);
             socket.write(nbuf);
             buf.slice(count*nbIAC);
         }
@@ -67,5 +70,6 @@ function negotiate(buf, socket) {
 }
 
 module.exports = {
-    negotiate:negotiate
-}
+    negotiate
+};
+

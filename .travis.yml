@@ -1,12 +1,7 @@
 language: node_js
 node_js:
-  - "6"
-  - "8"
-  - "9"
   - "10"
   - "11"
-
-notifications:
-  email: false
-  irc:
-    - "irc.freenode.net#evilprobe"
+  - "12"
+  - "13"
+  - "14"

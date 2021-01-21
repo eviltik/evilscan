@@ -1,6 +1,4 @@
 const net = require('net');
-const fs = require('fs');
-const stream = require('stream');
 const iac = require('./iac');
 
 class TcpScan {
@@ -21,7 +19,7 @@ class TcpScan {
             banner:'',
             status:null,
             opened:false
-        }
+        };
 
         this.socket = null;
         this.bufArray = [];
@@ -51,12 +49,12 @@ class TcpScan {
         // remove trailing spaces
         str = new (require('string_decoder').StringDecoder)('utf-8').write(str);
         str = str.toString();
-        str = str.replace(/\n/gm,'\\n');
-        str = str.replace(/\r/gm,'\\r');
-        str = str.replace(/\t/gm,'\\t');
-        str = str.replace(/ *$/,'');
-        str = str.replace(/^ */,'');
-        str = str.substr(0,this.opts.bannerlen);
+        str = str.replace(/\n/gm, '\\n');
+        str = str.replace(/\r/gm, '\\r');
+        str = str.replace(/\t/gm, '\\t');
+        str = str.replace(/ *$/, '');
+        str = str.replace(/^ */, '');
+        str = str.substr(0, this.opts.bannerlen);
         return str;
     }
 
@@ -108,7 +106,7 @@ class TcpScan {
         this.result.status = e.message;
     }
 
-    _onConnect(e) {
+    _onConnect(/*e*/) {
         this.log('connected');
         this.result.opened = true;
     }
@@ -120,15 +118,15 @@ class TcpScan {
         } else {
             this.result.status = 'open';
         }
-        this.socket && this.socket.destroy();;
+        this.socket && this.socket.destroy();
     }
 
     _onData(buf) {
         this.bufArray.push(buf);
         buf = iac.negotiate(buf, this.socket);
         if (this.result.banner.length < this.opts.bannerlen) {
-            let d = buf.toString('ascii');
-            if (d) this.log(d.replace(/[\n\r]/,' '));
+            const d = buf.toString('ascii');
+            if (d) this.log(d.replace(/[\n\r]/, ' '));
             return this.result.banner += d;
         }
         this.socket && this.socket.destroy();

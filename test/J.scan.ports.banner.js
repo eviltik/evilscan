@@ -1,49 +1,48 @@
 const expect = require('chai').expect;
-const net = require('net')
+const net = require('net');
 const telnet = require('sol-telnet'); // the only one supporting IAC server side
 const path = require('path');
 const evilscan = require('../');
 const port = 1026;
 
 // Local fake server
-const server = function(options,cb) {
-    let s = net.createServer(function(sock){
-        let ts = new telnet();
+const server = function(options, cb) {
+    const s = net.createServer(sock => {
+        const ts = new telnet();
         sock.pipe(ts).pipe(sock);
-
-    }).on('connection',function(s) {
-        setTimeout(function() {
+    }).on('connection', s => {
+        setTimeout(() => {
             return s.write(options.banner);
-        },options.timeout||0);
-    }).listen(port,cb)
+        }, options.timeout||0);
+    }).listen(port, cb);
     return s;
-}
+};
 
-suite(path.basename(__filename), a => {
+suite(path.basename(__filename), () => {
 
-    let socketTimeout = 100;
-    let testTimeout = 300;
+    const socketTimeout = 100;
+    const testTimeout = 300;
 
-    let opts = {
+    const opts = {
         target:'127.0.0.1',
-        port:port,
+        port,
         timeout:socketTimeout,
         banner:true
     };
 
-    let TcpScan = require('../libs/TcpScan');
-
-    let commonCheck = (r) => {
+    const commonCheck = (r) => {
         expect(r).to.be.a('object');
         expect(r).to.have.property('status');
-    }
+    };
 
-    test('connection should be refused 127.0.0.1:'+port, function(next) {
+    test('connection should be refused 127.0.0.1:'+port, next => {
 
         this.timeout(testTimeout);
 
         new evilscan(opts)
-            .on('error', err => {throw new Error(data.toString())})
+            .on('error', err => {
+                throw new Error(err);
+            })
             .on('result', r => {
                 commonCheck(r);
                 expect(r.status).to.be.equal('close (refused)');
@@ -60,11 +59,13 @@ suite(path.basename(__filename), a => {
 
         this.timeout(testTimeout);
 
-        let banner = 'hello\r\nworld\r\n';
-        let srv = server({banner:banner}, err => {
+        const banner = 'hello\r\nworld\r\n';
+        const srv = server({ banner }, (/*err*/) => {
 
             new evilscan(opts)
-                .on('error', err => {throw new Error(data.toString())})
+                .on('error', err => {
+                    throw new Error(err);
+                })
                 .on('result', r => {
                     commonCheck(r);
                     expect(r.status).to.be.equal('open');

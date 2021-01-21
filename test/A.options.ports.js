@@ -3,10 +3,10 @@ const path = require('path');
 
 suite(path.basename(__filename), () => {
 
-    let getPorts = require('../libs/options.js').getPorts;
+    const getPorts = require('../libs/options.js').getPorts;
 
     test('port: no port specified', () => {
-        getPorts(null, (err,r) => {
+        getPorts(null, (err, r) => {
             expect(err).to.be.equal(null);
             expect(r).to.be.a('array');
             expect(r[0]).to.be.equal(0);
@@ -14,14 +14,14 @@ suite(path.basename(__filename), () => {
     });
 
     test('port: bad port (--port=xy)', () => {
-        getPorts('xy', (err,r) => {
+        getPorts('xy', (err, r) => {
             expect(err).to.match(/invalid port/i);
             expect(r).to.be.equal(undefined);
         });
     });
 
     test('port: valid single port (--port=21)', () => {
-        getPorts('21', (err,r) => {
+        getPorts('21', (err, r) => {
             expect(err).to.be.equal(null);
             expect(r).to.be.a('array');
             expect(r[0]).to.be.equal(21);
@@ -29,29 +29,29 @@ suite(path.basename(__filename), () => {
     });
 
     test('port: valid port range (--port=21-23)', () => {
-        getPorts('21-23', (err,r) => {
+        getPorts('21-23', (err, r) => {
             expect(err).to.be.equal(null);
             expect(r).to.be.a('array');
             expect(r.length).to.be.equal(3);
-            expect(r).to.be.eql([21,22,23]);
+            expect(r).to.be.eql([21, 22, 23]);
         });
     });
 
     test('port: valid port list (--port=21,22,23)', () => {
-        getPorts('21,22,23', (err,r) => {
+        getPorts('21,22,23', (err, r) => {
             expect(err).to.be.equal(null);
             expect(r).to.be.a('array');
             expect(r.length).to.be.equal(3);
-            expect(r).to.be.eql([21,22,23]);
+            expect(r).to.be.eql([21, 22, 23]);
         });
     });
 
     test('port: valid port mixed (--port=21-23,80)', () => {
-        getPorts('21-23,80', (err,r) => {
+        getPorts('21-23,80', (err, r) => {
             expect(err).to.be.equal(null);
             expect(r).to.be.a('array');
             expect(r.length).to.be.equal(4);
-            expect(r).to.be.eql([21,22,23,80]);
+            expect(r).to.be.eql([21, 22, 23, 80]);
         });
     });
 });

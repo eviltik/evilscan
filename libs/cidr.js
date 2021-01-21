@@ -6,8 +6,8 @@ function long2ip(ip) {
 }
 
 function bindec(binary_string) {
-    binary_string = (binary_string + '').replace(/[^01]/gi,'');
-    return parseInt(binary_string,2);
+    binary_string = (binary_string + '').replace(/[^01]/gi, '');
+    return parseInt(binary_string, 2);
 }
 
 function ip2long(ip) {
@@ -22,15 +22,15 @@ function ip2long(ip) {
         ip[i] =parseInt(ip[i])||0;
     }
 
-    ip.push(256,256,256,256);
-    ip[4+ip[0]]*=Math.pow(256,4-ip[0]);
+    ip.push(256, 256, 256, 256);
+    ip[4+ip[0]]*=Math.pow(256, 4-ip[0]);
     if (ip[1]>=ip[5]||ip[2]>=ip[6]||ip[3]>=ip[7]||ip[4]>=ip[8]) return;
     return ip[1]*(ip[0]===1||16777216)+ip[2]*(ip[0]<2||65536)+ip[3]*(ip[0]<=3||256)+ip[4]*1;
 }
 
 function get(range) {
-    let ip_addr_cidr = range;
-    let ip_arr = ip_addr_cidr.split('/');
+    const ip_addr_cidr = range;
+    const ip_arr = ip_addr_cidr.split('/');
     if (!ip_arr[1]) return;
     if (!ip_arr[1].match(/^[0-9]{1,2}$/)) return;
     if (!net.isIPv4(ip_arr[0])) return;
@@ -42,12 +42,12 @@ function get(range) {
 
     ip_arr[1] = bindec(bin);
 
-    let ip = ip2long(ip_arr[0]);
-    let nm = ip2long(ip_arr[1]);
-    let nw = (ip & nm);
-    let bc = nw | (~nm);
+    const ip = ip2long(ip_arr[0]);
+    const nm = ip2long(ip_arr[1]);
+    const nw = (ip & nm);
+    const bc = nw | (~nm);
 
-    let ips = [];
+    const ips = [];
     for (let zm=1;(nw+zm)<(bc-1);zm++) {
         ips.push(long2ip(nw+zm));
     }
@@ -55,5 +55,6 @@ function get(range) {
 }
 
 module.exports = {
-    get:get
-}
+    get
+};
+
