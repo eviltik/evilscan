@@ -22,7 +22,9 @@ suite(path.basename(__filename), () => {
             reverse:true
         },
         result:{
-            "target":"127.0.0.1/29",
+            "target":[
+                "127.0.0.1/29"
+            ],
             "port":'21-23,80',
             "status":"TROU",
             "concurrency":1,

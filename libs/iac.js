@@ -57,7 +57,8 @@ function negotiate(buf, socket) {
                 case IAC.ENV_VARS:              str+='ENV_VARS';            break;
                 default:                        str+='UNKNOW';              break;
             }
-            let nbuf = new Buffer([IAC.IAC,IAC.WONT,buf[i]]);
+
+            let nbuf = new Buffer.from([IAC.IAC,IAC.WONT,buf[i]]);
             socket.write(nbuf);
             buf.slice(count*nbIAC);
         }

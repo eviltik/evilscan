@@ -252,10 +252,9 @@ function parse(args, callback) {
             if (args.infile) {
                 args.target = fs.readFileSync(args.infile).toString().trim().split('\n');
             } else {
-                args.target = [args.target || args._0];
+                args.target = [args.target || args._[0]];
             }
             async.mapSeries(args.target, (target, nextTarget) => {
-                console.log(target);
                 getTargets(target, nextTarget);
             }, next);
         },
