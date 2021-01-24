@@ -1,3 +1,6 @@
+v1.7.8 - 2021/01/25
+* remove travis-ci, add github ci
+
 v1.7.6 - 2021/01/24
 * fix #61 (badge GPL icon in the readme)
 * fix #60 (add infile and outfile option)
