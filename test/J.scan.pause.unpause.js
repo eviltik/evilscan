@@ -32,7 +32,7 @@ suite(path.basename(__filename), () => {
     // simulate command line
 
     arr.forEach(item => {
-        test('Binary: ['+item.args+'] '+item.title, next => {
+        test('Binary: ['+item.args+'] '+item.title, function(next) {
 
             this.timeout(10000);
 
@@ -105,7 +105,7 @@ suite(path.basename(__filename), () => {
 
         delete argv.json;
 
-        test('Module: '+cleanCmdLineArgs(item.args)+' '+item.title, next => {
+        test('Module: '+cleanCmdLineArgs(item.args)+' '+item.title, function(next) {
 
             this.timeout(10000);
 

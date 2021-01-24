@@ -35,7 +35,7 @@ suite(path.basename(__filename), () => {
         expect(r).to.have.property('status');
     };
 
-    test('connection should be refused 127.0.0.1:'+port, next => {
+    test('connection should be refused 127.0.0.1:'+port, function(next) {
 
         this.timeout(testTimeout);
 

@@ -71,7 +71,7 @@ suite(path.basename(__filename), () => {
             }
         });
 
-        test('Module: '+cleanCmdLineArgs(item.args)+' '+item.title, next => {
+        test('Module: '+cleanCmdLineArgs(item.args)+' '+item.title, function(next) {
 
             this.timeout(5000);
             let checked = false;
