@@ -153,6 +153,10 @@ Options
   --display       display result format (json,xml,console)
                   default console
 
+  --infile        fetch fqdn/ipv4/ipv6 target from a file
+  
+  --outfile       dump result in a file
+
   --json          shortcut for --display=json
 
   --xml           shortcut for --display=xml

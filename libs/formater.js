@@ -1,24 +1,52 @@
 const argv = require('minimist2')(process.argv.slice(2));
+const fs = require('fs');
 
-function outputJson(o) {
-    console.log(JSON.stringify(o));
+function outputJson(o, outputFile) {
+    const msg = JSON.stringify(o);
+    if (outputFile) {
+        return msg;
+    } else {
+        console.log(msg);
+    }
 }
 
-function outputRaw(o) {
+function outputRaw(o, outputFile) {
     if (o.error) {
-        return console.log('Error: ',o.error)
+        const msg = `Error: ${o.error}`;
+        if (outputFile) {
+            return msg;
+        }
+        console.log(msg);
+        return;
     }
     var str = '';
     for (var key in o) str+=o[key]+'|';
     str = str.replace(/\| ?$/,'');
-    console.log(str);
+    if (outputFile) {
+        return str;
+    } else {
+        console.log(str);
+    }
 }
 
-function output(o,argv) {
-    if (argv.json) {
-        return outputJson(o);
+function output(o, argv) {
+    if (argv.outfile) {
+        let line = '';
+        if (argv.json) {
+            line = outputJson(o, argv.outfile);
+        } else {
+            line = outputRaw(o, argv.outfile);
+        }
+        fs.appendFileSync(argv.outfile, line+'\n');
+        return;
     }
-    return outputRaw(o);
+
+    if (argv.json) {
+        outputJson(o);
+        return;
+    }
+    
+    outputRaw(o);
 }
 
 module.exports = output;

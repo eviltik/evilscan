@@ -1,3 +1,7 @@
+v1.7.6 - 2021/01/24
+* fix #61 (badge GPL icon in the readme)
+* fix #60 (add infile and outfile option)
+
 v1.7.5 - 2019/01/23
 * switch to MIT licence
 

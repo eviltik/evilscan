@@ -40,6 +40,7 @@ Options:
                   (i.e a /24 network with port range 0-65535)
   --display       display result format (json,xml,console)
                   default console
+  --outfile       dump result in a file
 
   --json          shortcut for --display=json
   --xml           shortcut for --display=xml

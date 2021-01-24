@@ -249,7 +249,15 @@ function parse(args, callback) {
 
     async.series([
         (next) => {
-            getTargets(args.target||args._[0], next);
+            if (args.infile) {
+                args.target = fs.readFileSync(args.infile).toString().trim().split('\n');
+            } else {
+                args.target = [args.target || args._0];
+            }
+            async.mapSeries(args.target, (target, nextTarget) => {
+                console.log(target);
+                getTargets(target, nextTarget);
+            }, next);
         },
         (next) => {
             getPorts(args.port, next);
@@ -259,6 +267,14 @@ function parse(args, callback) {
         if (err) return callback(err, args);
 
         args.ips = result[0];
+        let nips = [];
+        if (typeof args.ips === 'object') {
+            for (const ips of args.ips) {
+                nips = nips.concat(ips);
+            }
+            args.ips = nips;
+        }
+
         args.ports = result[1];
 
         if (!args.port && !args.reverse && !args.geo) {
