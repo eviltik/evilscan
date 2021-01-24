@@ -2,8 +2,6 @@ evilscan
 ===============
 
 ![Node.js CI](https://github.com/eviltik/evilscan/workflows/Node.js%20CI/badge.svg)
-[![Dependencies](https://david-dm.org/eviltik/evilscan.svg)](https://david-dm.org/eviltik/evilscan)
-[![Semver](http://img.shields.io/SemVer/2.0.0.png)](http://semver.org/spec/v2.0.0.html)
 [![npm version](https://badge.fury.io/js/evilscan.svg)](https://badge.fury.io/js/evilscan)
 [![Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=102)](https://github.com/ellerbrock/open-source-badge/)
 [![Dependency Status](https://david-dm.org/eviltik/evilscan.svg)](https://david-dm.org/eviltik/evilscan)
