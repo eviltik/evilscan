@@ -27,7 +27,7 @@ function getTargets(target, callback) {
                     callback('Could not resolve '+target);
                     return;
                 }
-                callback(err);
+                callback(err.message);
                 return;
             }
 
