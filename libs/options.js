@@ -23,7 +23,7 @@ function getTargets(target, callback) {
         ],
         (err, result) => {
             if (err) {
-                if (err.code=='ENOTFOUND') {
+                if (err.code === 'ENOTFOUND' || err.code === 'ESERVFAIL') {
                     callback('Could not resolve '+target);
                     return;
                 }
