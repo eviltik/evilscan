@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-const Evilscan = require('../');
-const options = require('../libs/options');
-const output = require('../libs/formater');
+const Evilscan = require('../src/');
+const options = require('../src/libs/options');
+const output = require('../src/libs/formater');
 const argv = require('minimist2')(process.argv.slice(2));
 
 const emptyLine = ''.padEnd(process.stdout.columns, ' ');
