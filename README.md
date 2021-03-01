@@ -32,63 +32,63 @@ Install
 Usage: in your code, using events only
 -------------------
 ```
-var evilscan = require('evilscan');
+const Evilscan = require('evilscan');
 
-var options = {
+const options = {
     target:'127.0.0.1',
     port:'21-23',
     status:'TROU', // Timeout, Refused, Open, Unreachable
     banner:true
 };
 
-var scanner = new evilscan(options);
+const evilscan = new Evilscan(options);
 
-scanner.on('result',function(data) {
+evilscan.on('result',data => {
     // fired when item is matching options
     console.log(data);
 });
 
-scanner.on('error',function(err) {
+evilscan.on('error', err => {
     throw new Error(data.toString());
 });
 
-scanner.on('done',function() {
+evilscan.on('done', () => {
     // finished !
 });
 
-scanner.run();
+evilscan.run();
 ```
 
 
 Usage: in your code, using callback and events
 -------------------
 ```
-var evilscan = require('evilscan');
+const Evilscan = require('evilscan');
 
-var options = {
+const options = {
     target:'127.0.0.1',
     port:'21-23',
     status:'TROU', // Timeout, Refused, Open, Unreachable
     banner:true
 };
 
-new evilscan(options, (err, scan) {
+new Evilscan(options, (err, scan) {
 
     if (err) {
         console.log(err);
         return;
     }
 
-    scan.on('result',function(data) {
+    scan.on('result', data => {
         // fired when item is matching options
         console.log(data);
     });
 
-    scan.on('error',function(err) {
+    scan.on('error', err => {
         throw new Error(data.toString());
     });
 
-    scan.on('done',function() {
+    scan.on('done', () => {
         // finished !
     });
 
@@ -173,7 +173,7 @@ Samples output
 
 * Every ports on localhost, grab banner, display only opened ports
 ```
-root@debian:~# evilscan 127.0.0.1 --port=0-65535 --banner
+eviltik@debian:~# evilscan 127.0.0.1 --port=0-65535 --banner
 127.0.0.1|111||open
 127.0.0.1|53||open
 127.0.0.1|23|Debian GNU/Linux jessie/sid\r\ndebian login:|open
@@ -188,7 +188,7 @@ done, 9 result(s)
 
 * Every ports on localhost, grab banner, display only opened ports, json output, progress status each seconds
 ```
-root@debian:~# evilscan 127.0.0.1 --port=0-65535 --banner --isopen --istimeout --progress --json
+eviltik@debian:~# evilscan 127.0.0.1 --port=0-65535 --banner --isopen --istimeout --progress --json
 {"_timeStart":"N/A","_timeElapsed":"N/A","_jobsTotal":65535,"_jobsRunning":0,"_jobsDone":0,"_progress":0,"_concurrency":500,"_status":"Starting","_message":"Starting"}
 {"_timeStart":1371245901876,"_timeElapsed":1031,"_jobsTotal":65535,"_jobsRunning":500,"_jobsDone":7638,"_progress":11,"_concurrency":500,"_status":"Running","_message":"Scanning 127.0.0.1:8138"}
 {"_timeStart":1371245901876,"_timeElapsed":2085,"_jobsTotal":65535,"_jobsRunning":500,"_jobsDone":16137,"_progress":24,"_concurrency":500,"_status":"Running","_message":"Scanning 127.0.0.1:16637"}
