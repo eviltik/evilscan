@@ -1,3 +1,7 @@
+v1.8.0 - 2021/03/01
+* refactor
+* close #59
+ 
 v1.7.8 - 2021/01/25
 * remove travis-ci, add github ci
 
