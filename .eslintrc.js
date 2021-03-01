@@ -31,7 +31,5 @@ module.exports = {
         'no-useless-escape':'off'
     },
     'globals':{
-        'suite':false,
-        'test':false
     }
 };
