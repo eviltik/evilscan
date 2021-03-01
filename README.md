@@ -3,7 +3,7 @@ evilscan
 
 ![Node.js CI](https://github.com/eviltik/evilscan/workflows/Node.js%20CI/badge.svg)
 [![npm version](https://badge.fury.io/js/evilscan.svg)](https://badge.fury.io/js/evilscan)
-[![Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=102)](https://github.com/ellerbrock/open-source-badge/)
+[![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)
 [![Dependency Status](https://david-dm.org/eviltik/evilscan.svg)](https://david-dm.org/eviltik/evilscan)
 
 Nodejs Simple Network Scanner
@@ -103,7 +103,7 @@ Usage: evilscan <fqdn|ipv4|cidr> [options]
 
 Example:
 ```
-root@debian:~# evilscan 192.168.0.0/24 --port=21-23,80
+evilscan 192.168.0.0/24 --port=21-23,80
 ```
 
 
@@ -183,6 +183,7 @@ root@debian:~# evilscan 127.0.0.1 --port=0-65535 --banner
 127.0.0.1|35223||open
 127.0.0.1|35491||open
 127.0.0.1|39619||open
+done, 9 result(s)
 ```
 
 * Every ports on localhost, grab banner, display only opened ports, json output, progress status each seconds
