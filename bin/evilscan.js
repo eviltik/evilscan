@@ -1,53 +1,71 @@
 #!/usr/bin/env node
-const evilscan = require('../');
+const Evilscan = require('../');
 const options = require('../libs/options');
 const output = require('../libs/formater');
-const printf = require('printf');
 const argv = require('minimist2')(process.argv.slice(2));
 
-options.parse(argv, (err, options) => {
-    if (err) {
-        console.log('Error: ',err);
-        process.exit(0);
+const emptyLine = ''.padEnd(process.stdout.columns, ' ');
+
+function runScan(options) {
+
+    let count = 0;
+
+    function resetLine() {
+        if (options.json) return;
+        process.stdout.write(`${emptyLine}\r`);
     }
 
-    let scan = new evilscan(options);
+    function onResult(data) {
+        count++;
+        resetLine();
+        output(data, options);
+    }
 
-    //console.log(scan.getInfo());
-
-    scan.on('result',function(data) {
-        if (!options.json) {
-            process.stderr.write('\r\033[0K');
-        }
-        output(data,options);
-    });
-
-    scan.on('done',function() {
-        if (!options.json) {
-            console.log();
-        }
-    });
-
-    scan.on('error',function(err) {
-        console.log(err);
-        process.exit(0);
-    });
-
-    scan.on('progress',function(data) {
-        if (options.json) {
-            output(data,options);
+    function onDone() {
+        if (options.json) return;
+        if (!options.progress) return;
+        if (!count) {
+            resetLine();
+            console.log('done, nothing found');
         } else {
-            process.stderr.write('\r\033[0K'+data._message+' ('+data._jobsDone+'/'+data._jobsTotal+' '+data._progress+'%)');
+            console.log(`done, ${count} result(s)`);
         }
-    });
-
-    /*
-    if (!options.json) {
-        scan.on('scan',function(data) {
-            process.stdout.write('\r\033[0KScanning '+data.ip+':'+data.port);
-        })
     }
-    */
 
-    scan.run();
-});
+    function onError(err) {
+        throw err;
+    }
+
+    function onProgress(data) {
+        if (options.json) {
+            output(data, options);
+        } else {
+            resetLine();
+            process.stdout.write(`${data._message} (${data._jobsDone}/${data._jobsTotal} ${data._progress}%)\r`);
+        }
+    }
+
+    const evilscan = new Evilscan(options);
+
+    evilscan.on('result', onResult);
+    evilscan.on('done', onDone);
+    evilscan.on('error', onError);
+    evilscan.on('progress', onProgress);
+
+    evilscan.run();
+}
+
+function onOptionParsed(err, options) {
+
+    if (err) {
+        throw err;
+    }
+
+    if (!options.json) {
+        process.stdout.write('Preparing scan, please wait ...\r');
+    }
+
+    runScan(options);
+}
+
+options.parse(argv, onOptionParsed);
