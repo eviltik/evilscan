@@ -33,7 +33,13 @@ function runScan(options) {
     }
 
     function onError(err) {
-        throw err;
+        resetLine();
+        if (err.message) {
+            console.log(err.message);
+        } else {
+            console.log(err);
+        }
+        process.exit(1);
     }
 
     function onProgress(data) {
@@ -58,7 +64,8 @@ function runScan(options) {
 function onOptionParsed(err, options) {
 
     if (err) {
-        throw err;
+        console.log(err);
+        process.exit(1);
     }
 
     if (!options.json) {
