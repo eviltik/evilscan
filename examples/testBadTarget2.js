@@ -1,13 +1,13 @@
-var evilscan = require('../');
+const Evilscan = require('../');
 
-let options = {
+const options = {
     target: 'asasasas',
     port: 22,
     status: 'TROU',
     banner: true
-}
+};
 
-new evilscan(options, (err, scan) => {
+new Evilscan(options, (err, scan) => {
     if (err) {
         console.log(err);
         process.exit();
