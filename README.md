@@ -2,9 +2,9 @@ evilscan
 ===============
 
 ![Node.js CI](https://github.com/eviltik/evilscan/workflows/Node.js%20CI/badge.svg)
-[![npm version](https://badge.fury.io/js/evilscan.svg)](https://badge.fury.io/js/evilscan)
+[![npm version](https://badge.fury.io/js/evilscan.svg?1.8.0)](https://badge.fury.io/js/evilscan)
 [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)
-[![Dependency Status](https://david-dm.org/eviltik/evilscan.svg)](https://david-dm.org/eviltik/evilscan)
+[![Depfu](https://badges.depfu.com/badges/60413e5ea875bbdff97a0b099a948e75/overview.svg)](https://depfu.com/github/eviltik/evilscan?project_id=22885)
 
 Nodejs Simple Network Scanner
 
