@@ -1,8 +1,15 @@
 const net = require('net');
 
 function long2ip(ip) {
-    if (!isFinite(ip)) return false;
-    return [ip >>> 24, ip >>> 16 & 0xFF, ip >>> 8 & 0xFF, ip & 0xFF].join('.');
+    if (!isFinite(ip)) {
+        return false;
+    }
+    return [
+        ip >>> 24,
+        ip >>> 16 & 0xFF,
+        ip >>> 8 & 0xFF,
+        ip & 0xFF
+    ].join('.');
 }
 
 function bindec(binary_string) {
@@ -57,4 +64,3 @@ function get(range) {
 module.exports = {
     get
 };
-

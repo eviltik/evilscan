@@ -2,7 +2,6 @@ const net = require('net');
 const cidr = require('./cidr');
 const dns = require('dns');
 const async = require('async');
-const findup = require('findup-sync');
 const fs = require('fs');
 
 function getTargets(target, callback) {
@@ -217,14 +216,15 @@ function defaultValues(argv) {
 function help(args) {
 
     if (args.help) {
-        console.log(fs.readFileSync(findup('help.txt')).toString());
+        console.log(fs.readFileSync(`${__dirname}/help.txt`).toString());
         process.exit(0);
     }
 
     let packageInfo = {};
 
     if (args.version||args.about) {
-        packageInfo = JSON.parse(fs.readFileSync(findup('package.json')));
+        console.log(__dirname);
+        packageInfo = JSON.parse(fs.readFileSync(`${__dirname}/../../package.json`));
     }
 
     if (args.version) {

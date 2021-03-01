@@ -18,8 +18,8 @@ function outputRaw(o, outputFile) {
         console.log(msg);
         return;
     }
-    var str = '';
-    for (var key in o) str+=o[key]+'|';
+    let str = '';
+    for (const key in o) str+=o[key]+'|';
     str = str.replace(/\| ?$/, '');
     if (outputFile) {
         return str;
