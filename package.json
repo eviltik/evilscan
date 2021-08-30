@@ -28,12 +28,12 @@
     "url": "https://github.com/eviltik/evilscan/issues"
   },
   "dependencies": {
-    "async": "^3.2.0",
+    "async": "^3.2.1",
     "minimist2": "^1.0.2",
     "qjobs": "^1.2.0"
   },
   "devDependencies": {
     "sol-telnet": "latest",
-    "tape": "^5.2.1"
+    "tape": "^5.3.1"
   }
 }
