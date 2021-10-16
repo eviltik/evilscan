@@ -72,7 +72,7 @@ const options = {
     banner:true
 };
 
-new Evilscan(options, (err, scan) {
+new Evilscan(options, (err, scan) => {
 
     if (err) {
         console.log(err);
