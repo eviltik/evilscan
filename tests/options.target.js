@@ -20,9 +20,17 @@ tester(scriptName+':target: bad ipv4 327.0.0.10', (test) => {
     });
 });
 
-tester(scriptName+':target: unsupported ipv6 2001:db8:0:85a3:0:0:ac1f:8001', (test) => {
+tester(scriptName+':target: supported ipv6 2001:db8:0:85a3:0:0:ac1f:8001', (test) => {
     getTargets('2001:db8:0:85a3:0:0:ac1f:8001', (err, r) => {
-        test.equal(/not supported/i.test(err), true, 'should return '+err);
+        test.equal(err, null, 'should not return an error');
+        test.equal(Array.isArray(r), true, 'result should be an array');
+        test.end();
+    });
+});
+
+tester(scriptName+':target: invalid compressed ipv6 fe80:2030:31:24', (test) => {
+    getTargets('fe80:2030:31:24', (err, r) => {
+        test.equal(/could not resolve/i.test(err), true, 'should return '+err);
         test.equal(r, undefined, 'should not return result');
         test.end();
     });
@@ -64,6 +72,16 @@ tester(scriptName+':target: valid ipv4 cidr: 127.0.0.1/24', (test) => {
         test.end();
     });
 });
+
+
+tester(scriptName+':target: valid ipv6 cidr: 2001:4860:4000::/36 not yet implemented', (test) => {
+    getTargets('2001:4860:4000::/36', (err, r) => {
+        test.equal(/not yet implemented/i.test(err), true, 'should return '+err);
+        test.equal(r, undefined, 'should not return result');
+        test.end();
+    });
+});
+
 
 tester(scriptName+':target: resolve existing host google.com', (test) => {
     getTargets('google.com', (err, r) => {

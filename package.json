@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "async": "^3.2.1",
-    "minimist2": "^1.0.2",
+    "minimist": "^1.2.6",
     "qjobs": "^1.2.0"
   },
   "devDependencies": {

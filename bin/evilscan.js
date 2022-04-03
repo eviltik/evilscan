@@ -2,7 +2,7 @@
 const Evilscan = require('../src/');
 const options = require('../src/libs/options');
 const output = require('../src/libs/formater');
-const argv = require('minimist2')(process.argv.slice(2));
+const argv = require('minimist')(process.argv.slice(2));
 
 const emptyLine = ''.padEnd(process.stdout.columns, ' ');
 
