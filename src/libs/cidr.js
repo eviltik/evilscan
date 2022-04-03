@@ -37,28 +37,33 @@ function ip2long(ip) {
 
 function get(range) {
     const ip_addr_cidr = range;
-    const ip_arr = ip_addr_cidr.split('/');
-    if (!ip_arr[1]) return;
-    if (!ip_arr[1].match(/^[0-9]{1,2}$/)) return;
-    if (!net.isIPv4(ip_arr[0])) return;
-
-    let bin='';
-    for (let i=1;i<=32;i++) {
-        bin+=ip_arr[1]>=i?'1':'0';
-    }
-
-    ip_arr[1] = bindec(bin);
-
-    const ip = ip2long(ip_arr[0]);
-    const nm = ip2long(ip_arr[1]);
-    const nw = (ip & nm);
-    const bc = nw | (~nm);
+    let [address, subnetSize] = ip_addr_cidr.split('/');
+    if (!subnetSize) return;
+    if (!subnetSize.match(/^[0-9]{1,3}$/)) return;
+    if (!net.isIPv4(address) && !net.isIPv6(address)) return;
 
     const ips = [];
-    for (let zm=1;(nw+zm)<(bc-1);zm++) {
-        ips.push(long2ip(nw+zm));
+    if (net.isIPv4(address)) {
+        let bin='';
+        for (let i=1;i<=32;i++) {
+            bin+=subnetSize>=i?'1':'0';
+        }
+
+        subnetSize = bindec(bin);
+
+        const ip = ip2long(address);
+        const nm = ip2long(subnetSize);
+        const nw = (ip & nm);
+        const bc = nw | (~nm);
+
+        for (let zm=1;(nw+zm)<(bc-1);zm++) {
+            ips.push(long2ip(nw+zm));
+        }
+        return ips;
+    } else {
+        throw new Error('IPv6 subnet scanning not yet implemented');
+        return ips;
     }
-    return ips;
 }
 
 module.exports = {

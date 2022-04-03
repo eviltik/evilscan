@@ -7,7 +7,11 @@ const fs = require('fs');
 function getTargets(target, callback) {
 
     if (!target) {
-        return callback('Please specify at least a target [cidr|ipv4|host], example:\nevilscan 192.168.0.0/24 --port=21,22,23,80,5900-5910');
+        return callback(
+            'Please specify at least a target [ipv4-cidr|ipv4|ipv6|host], examples:\n' +
+            'evilscan 192.168.0.0/24 --port=21,22,23,80,5900-5910\n' +
+            'evilscan 2a00:1450:400e:800::200e --port=80,443\n'
+            );
     }
 
     async.series(
@@ -31,13 +35,11 @@ function getTargets(target, callback) {
             }
 
             target = result[0][0]+'';
-
             if (target.match(/\-/)) {
                 const splitTarget = target.split('-');
                 const minHost = splitTarget[0];
                 const ips = [];
                 let splitMinHost, maxHost;
-
                 if (net.isIPv4(minHost)) {
                     splitMinHost = minHost.split('.');
                     if (net.isIPv4(splitTarget[1])) {
@@ -51,15 +53,19 @@ function getTargets(target, callback) {
                             return;
                         }
                     }
+                } else if (net.isIPv6(minHost)) {
+                    callback('IPv6 ranges are not yet supported');
+                    return;
                 } else {
                     callback('Invalid IPv4 target. ie: 192.168.0.1-5, 192.168.0.1-192.168.0.5');
                     return;
                 }
 
-                for (let i = parseInt(splitMinHost[3]); i <= parseInt(maxHost); i++) {
-                    ips.push(splitMinHost[0] + '.' + splitMinHost[1] + '.' + splitMinHost[2] + '.' + i);
-                }
-
+                if (net.isIPv4(minHost)) {
+                    for (let i = parseInt(splitMinHost[3]); i <= parseInt(maxHost); i++) {
+                        ips.push(splitMinHost[0] + '.' + splitMinHost[1] + '.' + splitMinHost[2] + '.' + i);
+                    }
+                } 
                 if (!ips) {
                     callback('Invalid IPv4 target. Please specify a target using --target [cidr|ip|range]');
                     return;
@@ -69,7 +75,11 @@ function getTargets(target, callback) {
                 return;
             }
 
-            if (target.match(/\//)) {
+            if (targetMatch = target.match(/\//)) {
+                if (net.isIPv6(target.substring(0, targetMatch.index))) {
+                    callback('IPv6 subnet scanning not yet implemented');
+                    return;
+                }
                 const ips = cidr.get(target);
                 if (!ips) {
                     callback('Invalid IPv4 CIDR target. Please specify a target using --target [cidr|ip|range]');
@@ -79,18 +89,13 @@ function getTargets(target, callback) {
                 return;
             }
 
-            if (net.isIPv6(target)) {
-                callback('IPv6 not supported');
-                return;
-            }
-
             if (target == '127.0.0.1') {
                 callback(null, [target]);
                 return;
             }
 
-            if (!net.isIPv4(target)) {
-                callback('Target '+target+' is not a valid IPv4');
+            if (!net.isIPv4(target) && !net.isIPv6(target)) {
+                callback('Target '+target+' is not a valid IPv4/IPv6');
                 return;
             }
             callback(null, [target]);
