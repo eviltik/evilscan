@@ -28,7 +28,7 @@
     "url": "https://github.com/eviltik/evilscan/issues"
   },
   "dependencies": {
-    "async": "^3.2.1",
+    "async": "^3.2.3",
     "minimist": "^1.2.6",
     "qjobs": "^1.2.0"
   },
