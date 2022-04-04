@@ -1,3 +1,6 @@
+v1.9.1 - 2022/04/04
+* fix README example
+  
 v1.9.0 - 2022/04/04
 * add #32 (single ipv6 support)
 * maintenance (upgrade node packages)
