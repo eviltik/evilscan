@@ -1,7 +1,11 @@
+v1.9.0 - 2022/04/04
+* add #32 (single ipv6 support)
+* maintenance (upgrade node packages)
+
 v1.8.1 - 2021/08/30
 * maintenance (upgrade node packages)
   
-* v1.8.0 - 2021/03/01
+v1.8.0 - 2021/03/01
 * refactor
 * close #59
  

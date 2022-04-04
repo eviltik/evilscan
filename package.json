@@ -1,6 +1,6 @@
 {
   "name": "evilscan",
-  "version": "1.8.1",
+  "version": "1.9.0",
   "description": "Simple ports scanner for node.",
   "main": "src/index.js",
   "scripts": {
@@ -28,12 +28,12 @@
     "url": "https://github.com/eviltik/evilscan/issues"
   },
   "dependencies": {
-    "async": "^3.2.1",
-    "minimist": "^1.2.6",
-    "qjobs": "^1.2.0"
+    "async": "3.2.3",
+    "minimist": "1.2.6",
+    "qjobs": "1.2.0"
   },
   "devDependencies": {
-    "sol-telnet": "latest",
-    "tape": "^5.3.1"
+    "sol-telnet": "0.1.1",
+    "tape": "5.5.2"
   }
 }
