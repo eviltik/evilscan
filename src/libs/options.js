@@ -85,7 +85,7 @@ function getTargets(target, callback) {
                 )
 
                 if (net.isIPv4(minHost)) {
-                    for (let ip = numMinHost; ip <= numMaxHost; i++) {
+                    for (let ip = numMinHost; ip <= numMaxHost; ip++) {
                         ips.push(cidr.long2ip(ip))
                     }
                 }
