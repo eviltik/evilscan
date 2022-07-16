@@ -67,5 +67,6 @@ function get(range) {
 }
 
 module.exports = {
-    get
+    get,
+    long2ip
 };

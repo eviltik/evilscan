@@ -38,16 +38,23 @@ function getTargets(target, callback) {
             if (target.match(/\-/)) {
                 const splitTarget = target.split('-');
                 const minHost = splitTarget[0];
+                const maxHost = splitTarget[1];
                 const ips = [];
-                let splitMinHost, maxHost;
+                let splitMinHost, splitMaxHost;
                 if (net.isIPv4(minHost)) {
-                    splitMinHost = minHost.split('.');
-                    if (net.isIPv4(splitTarget[1])) {
-                        maxHost = splitTarget[1].split('.')[3];
+                    splitMinHost = minHost.split(".").map(Number)
+
+                    if (net.isIPv4(maxHost)) {
+                        splitMaxHost = maxHost.split('.').map(Number);
                     } else {
                         // Check if the string is a positive integer
-                        if (splitTarget[1] >>> 0 === parseFloat(splitTarget[1])) {
-                            maxHost = splitTarget[1];
+                        if (splitTarget[1] >>> 0 === Number(maxHost)) {
+                            splitMaxHost = [
+                                splitMinHost[0],
+                                splitMinHost[1],
+                                splitMinHost[2],
+                                Number(maxHost)
+                            ];
                         } else {
                             callback('Invalid IPv4 target range, ie: 192.168.0.1-5, 192.168.0.1-192.168.0.5');
                             return;
@@ -61,11 +68,15 @@ function getTargets(target, callback) {
                     return;
                 }
 
+                const numMinHost = splitMinHost.reduce((prev, val, i) => prev + val * 256 ** (3 - i), 0)
+                const numMaxHost = splitMaxHost.reduce((prev, val, i) => prev + val * 256 ** (3 - i), 0)
+
                 if (net.isIPv4(minHost)) {
-                    for (let i = parseInt(splitMinHost[3]); i <= parseInt(maxHost); i++) {
-                        ips.push(splitMinHost[0] + '.' + splitMinHost[1] + '.' + splitMinHost[2] + '.' + i);
+                    for (let ip = numMinHost; ip <= numMaxHost; i++) {
+                        ips.push(cidr.long2ip(i))
                     }
-                } 
+                }
+
                 if (!ips) {
                     callback('Invalid IPv4 target. Please specify a target using --target [cidr|ip|range]');
                     return;
