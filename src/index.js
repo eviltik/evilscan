@@ -310,7 +310,7 @@ class Evilscan extends EventEmitter {
 
     _portScanFormatResult(data, result) {
 
-        if (!result || !this.options.port || !data) {
+        if (!result || !(this.options.port || this.options.ports) || !data) {
             return result;
         }
 
